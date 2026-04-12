@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login — ABCDNEWS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Be+Vietnam+Pro:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="./assets/css/base.css"/>
+  <link rel="stylesheet" href="./assets/css/admin-login.css"/>
+</head>
+<body>
+
+<!-- ═══ LEFT PANEL ═══ -->
+<div class="left-panel">
+  <div class="lp-logo">ABCDNEWS</div>
+
+  <div class="lp-mid">
+    <div class="lp-badge">
+      <div class="lp-badge-dot"></div>
+      <span>Restricted Access</span>
+    </div>
+    <h1 class="lp-title">Admin<br/>Control<br/>Panel</h1>
+    <p class="lp-desc">Khu vực quản trị dành riêng cho ban biên tập và quản trị viên hệ thống.</p>
+    <div class="lp-features">
+      <div class="lp-feat">Đăng &amp; quản lý bài viết</div>
+      <div class="lp-feat">Quản lý danh mục</div>
+      <div class="lp-feat">Xem thống kê lượt đọc</div>
+      <div class="lp-feat">Duyệt &amp; xóa bình luận</div>
+    </div>
+  </div>
+
+  <div class="lp-foot">
+    <a href="index.html">← Về trang chủ</a> &nbsp;·&nbsp; ABCDNEWS © 2025
+  </div>
+</div>
+
+<!-- ═══ RIGHT PANEL ═══ -->
+<div class="right-panel">
+  <div class="login-box">
+    <p class="login-heading">// admin authentication</p>
+    <h2 class="login-title">Đăng nhập<br/>Quản trị</h2>
+
+    <div class="form-group">
+      <label class="form-label">Email Admin</label>
+      <input class="form-input-mono" type="email" id="admin-email"
+        placeholder="admin@abcdnews.vn"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mật khẩu</label>
+      <input class="form-input-mono" type="password" id="admin-pass"
+        placeholder="••••••••••••"
+        onkeydown="if(event.key==='Enter') handleAdminLogin()"/>
+    </div>
+
+    <button class="btn-login" id="btn-admin-login" onclick="handleAdminLogin()">
+      Đăng nhập hệ thống →
+    </button>
+
+    <div class="msg" id="admin-msg"></div>
+
+    <div class="security-note">
+      <span class="security-note-icon">⚠</span>
+      <p>Chỉ tài khoản có quyền <strong>admin</strong> mới được truy cập. Mọi lần đăng nhập đều được ghi lại.</p>
+    </div>
+
+    <div class="divider">hoặc</div>
+
+    <button class="btn-back" onclick="location.href='auth.html'">
+      ← Đăng nhập tài khoản thường
+    </button>
+  </div>
+</div>
+
+<script type="module">
+  import { auth, db } from './firebase-config.js';
+  import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+  import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+  function showMsg(text, type) {
+    const el = document.getElementById('admin-msg');
+    el.textContent = text;
+    el.className = `msg ${type}`;
+  }
+
+  window.handleAdminLogin = async () => {
+    const email = document.getElementById('admin-email').value.trim();
+    const pass  = document.getElementById('admin-pass').value;
+    if (!email || !pass) return showMsg('✗ Vui lòng nhập đầy đủ thông tin.', 'error');
+
+    const btn = document.getElementById('btn-admin-login');
+    btn.disabled = true;
+    btn.textContent = 'Đang xác thực...';
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, pass);
+      const snap = await getDoc(doc(db, 'users', cred.user.uid));
+
+      if (!snap.exists() || snap.data().role !== 'admin') {
+        await auth.signOut();
+        showMsg('✗ Tài khoản này không có quyền Admin.', 'error');
+        btn.disabled = false;
+        btn.textContent = 'Đăng nhập hệ thống →';
+        return;
+      }
+
+      showMsg('✓ Xác thực thành công! Đang chuyển hướng...', 'success');
+      setTimeout(() => location.href = 'admin.html', 1200);
+    } catch(e) {
+      showMsg('✗ Email hoặc mật khẩu không đúng.', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Đăng nhập hệ thống →';
+    }
+  };
+</script>
+</body>
+</html>

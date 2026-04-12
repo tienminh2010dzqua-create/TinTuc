@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đăng nhập — ABCDNEWS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Be+Vietnam+Pro:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="./assets/css/base.css"/>
+  <link rel="stylesheet" href="./assets/css/auth.css"/>
+</head>
+<body>
+
+<div class="auth-box">
+  <!-- Brand -->
+  <div class="brand">
+    <h1>ABCDNEWS</h1>
+    <p>Tin tức mỗi ngày</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="auth-tabs">
+    <button class="tab-btn active" onclick="switchTab('login')">Đăng nhập</button>
+    <button class="tab-btn"        onclick="switchTab('register')">Đăng ký</button>
+  </div>
+
+  <!-- Login panel -->
+  <div class="form-panel active" id="panel-login">
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="example@email.com"/>
+    </div>
+    <div class="form-group">
+      <label>Mật khẩu</label>
+      <input type="password" id="login-pass" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter') handleLogin()"/>
+    </div>
+    <button class="btn-submit" onclick="handleLogin()">Đăng nhập</button>
+    <div class="msg" id="login-msg"></div>
+    <p class="auth-footer">
+      Là Admin? <a href="admin-login.html">Đăng nhập tại đây →</a>
+    </p>
+  </div>
+
+  <!-- Register panel -->
+  <div class="form-panel" id="panel-register">
+    <div class="form-group">
+      <label>Họ tên</label>
+      <input type="text" id="reg-name" placeholder="Nguyễn Văn A"/>
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="reg-email" placeholder="example@email.com"/>
+    </div>
+    <div class="form-group">
+      <label>Mật khẩu</label>
+      <input type="password" id="reg-pass" placeholder="Tối thiểu 6 ký tự"/>
+    </div>
+    <button class="btn-submit" onclick="handleRegister()">Tạo tài khoản</button>
+    <div class="msg" id="reg-msg"></div>
+  </div>
+</div>
+
+<script type="module">
+  import { auth, db } from './firebase-config.js';
+  import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    updateProfile
+  } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+  import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+  // ── Tab switcher ─────────────────────────────────────────
+  window.switchTab = (tab) => {
+    const isLogin = tab === 'login';
+    document.querySelectorAll('.tab-btn').forEach((b,i) =>
+      b.classList.toggle('active', isLogin ? i===0 : i===1)
+    );
+    document.getElementById('panel-login').classList.toggle('active', isLogin);
+    document.getElementById('panel-register').classList.toggle('active', !isLogin);
+  };
+
+  function showMsg(id, text, type) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = `msg ${type}`;
+  }
+
+  // ── Login ────────────────────────────────────────────────
+  window.handleLogin = async () => {
+    const email = document.getElementById('login-email').value.trim();
+    const pass  = document.getElementById('login-pass').value;
+    if (!email || !pass) return showMsg('login-msg', '✗ Vui lòng nhập đầy đủ thông tin.', 'error');
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+      showMsg('login-msg', '✓ Đăng nhập thành công! Đang chuyển hướng...', 'success');
+      setTimeout(() => location.href = 'index.html', 1200);
+    } catch(e) {
+      showMsg('login-msg', '✗ Email hoặc mật khẩu không đúng.', 'error');
+    }
+  };
+
+  // ── Register ─────────────────────────────────────────────
+  window.handleRegister = async () => {
+    const name  = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const pass  = document.getElementById('reg-pass').value;
+    if (!name)  return showMsg('reg-msg', '✗ Vui lòng nhập họ tên.', 'error');
+    if (!email) return showMsg('reg-msg', '✗ Vui lòng nhập email.', 'error');
+    if (pass.length < 6) return showMsg('reg-msg', '✗ Mật khẩu tối thiểu 6 ký tự.', 'error');
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      await updateProfile(cred.user, { displayName: name });
+      await setDoc(doc(db, 'users', cred.user.uid), {
+        name, email, role: 'reader', createdAt: serverTimestamp()
+      });
+      showMsg('reg-msg', '✓ Tạo tài khoản thành công!', 'success');
+      setTimeout(() => location.href = 'index.html', 1200);
+    } catch(e) {
+      const msgs = {
+        'auth/email-already-in-use': '✗ Email này đã được sử dụng.',
+        'auth/invalid-email':        '✗ Địa chỉ email không hợp lệ.',
+        'auth/weak-password':        '✗ Mật khẩu quá yếu.'
+      };
+      showMsg('reg-msg', msgs[e.code] || '✗ Có lỗi xảy ra. Vui lòng thử lại.', 'error');
+    }
+  };
+</script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — ABCDNEWS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Be+Vietnam+Pro:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="./assets/css/base.css"/>
+  <link rel="stylesheet" href="./assets/css/admin.css"/>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="site-header">
+  <div class="header-top" style="padding:0 48px;">
+    <div style="display:flex;align-items:center;gap:14px;padding:14px 0;border-right:1px solid var(--border);padding-right:22px;margin-right:22px;">
+      <a href="index.html" class="logo logo-sm">ABCDNEWS</a>
+      <span class="badge-admin">Admin</span>
+    </div>
+    <div class="header-nav">
+      <button class="nav-item active" id="nav-write" onclick="switchTab('write',this)">✏️ Viết bài</button>
+      <button class="nav-item"        id="nav-list"  onclick="switchTab('list',this)">📋 Bài viết</button>
+      <button class="nav-item"        id="nav-cats"  onclick="switchTab('cats',this)">🗂 Danh mục</button>
+    </div>
+    <div class="header-right">
+      <span class="user-chip" id="user-chip"></span>
+      <button class="btn" onclick="handleLogout()">Đăng xuất</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ CONTENT ═══ -->
+<div class="container-md" id="main-content">
+  <p style="text-align:center;padding:80px;color:var(--muted)">Đang kiểm tra quyền truy cập...</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { auth, db, storage } from './firebase-config.js';
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+  import {
+    collection, addDoc, getDocs, deleteDoc,
+    doc, getDoc, setDoc, updateDoc,
+    serverTimestamp, query, orderBy
+  } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+  import { ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
+
+  let currentUser = null;
+
+  // ── Auth ─────────────────────────────────────────────────
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { showDenied('login'); return; }
+    const snap = await getDoc(doc(db,'users',user.uid));
+    if (!snap.exists() || snap.data().role !== 'admin') { showDenied('role'); return; }
+    currentUser = user;
+    document.getElementById('user-chip').textContent = user.displayName || user.email;
+    renderTab('write');
+  });
+
+  window.handleLogout = async () => { await signOut(auth); location.href = 'admin-login.html'; };
+
+  function showDenied(r) {
+    document.getElementById('main-content').innerHTML = `
+      <div class="access-denied">
+        <h2>${r==='login' ? 'Chưa đăng nhập' : 'Không có quyền Admin'}</h2>
+        <p>${r==='login' ? 'Vui lòng đăng nhập bằng tài khoản Admin.' : 'Tài khoản này không được cấp quyền.'}</p>
+        <button class="btn-primary" onclick="location.href='admin-login.html'">Đăng nhập Admin →</button>
+      </div>`;
+  }
+
+  // ── Tab switching ────────────────────────────────────────
+  window.switchTab = (tab, el) => {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    renderTab(tab);
+  };
+
+  function renderTab(tab) {
+    if (tab === 'write') renderWrite();
+    else if (tab === 'list') renderList();
+    else renderCats();
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // TAB: WRITE
+  // ══════════════════════════════════════════════════════════
+  async function renderWrite() {
+    const cSnap = await getDocs(collection(db,'categories'));
+    const cats  = cSnap.docs.map(d => d.data().name).sort((a,b) => a.localeCompare(b,'vi'));
+    const fallback = ['Thời sự','Công nghệ','Kinh tế','Thể thao','Giải trí','Sức khỏe','Du lịch'];
+    const allCats  = cats.length ? cats : fallback;
+
+    document.getElementById('main-content').innerHTML = `
+      <div class="section-title">Viết bài mới</div>
+      <p class="section-sub">Bài đăng sẽ hiển thị ngay trên trang chủ.</p>
+      <div class="form-card">
+        <div class="form-card-title">// thông tin bài viết</div>
+        <div class="form-group">
+          <label>Tiêu đề *</label>
+          <input type="text" id="f-title" placeholder="Tiêu đề hấp dẫn..."/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Danh mục</label>
+            <select id="f-cat">${allCats.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
+          </div>
+          <div class="form-group">
+            <label>Tác giả</label>
+            <input type="text" id="f-author" value="${currentUser?.displayName||''}"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Tóm tắt</label>
+          <input type="text" id="f-excerpt" placeholder="Mô tả ngắn hiển thị ở trang chủ..."/>
+        </div>
+        <div class="form-group">
+          <label>Ảnh thumbnail</label>
+          <input type="file" id="f-thumb" accept="image/*"/>
+        </div>
+        <div class="form-group">
+          <label>Nội dung *</label>
+          <textarea id="f-content" placeholder="Viết nội dung đầy đủ..."></textarea>
+        </div>
+        <div style="display:flex;gap:14px;align-items:center;">
+          <button class="btn-primary" id="btn-pub" onclick="doPublish()">🚀 Đăng bài</button>
+          <span class="pub-status" id="pub-st"></span>
+        </div>
+      </div>`;
+    window.doPublish = doPublish;
+  }
+
+  async function doPublish() {
+    const title   = document.getElementById('f-title').value.trim();
+    const content = document.getElementById('f-content').value.trim();
+    if (!title || !content) { showToast('Vui lòng nhập tiêu đề và nội dung!','error'); return; }
+    const btn = document.getElementById('btn-pub');
+    const st  = document.getElementById('pub-st');
+    btn.disabled = true; st.textContent = '⏳ Đang xử lý...';
+
+    let thumbnail = '';
+    const file = document.getElementById('f-thumb').files[0];
+    if (file) {
+      try {
+        const r = sRef(storage, `thumbnails/${Date.now()}_${file.name}`);
+        const s = await uploadBytes(r, file);
+        thumbnail = await getDownloadURL(s.ref);
+      } catch(e) { console.warn('Upload ảnh thất bại', e); }
+    }
+
+    await addDoc(collection(db,'articles'), {
+      title, content,
+      excerpt:   document.getElementById('f-excerpt').value.trim(),
+      category:  document.getElementById('f-cat').value,
+      author:    document.getElementById('f-author').value.trim(),
+      thumbnail, authorId: currentUser.uid,
+      createdAt: serverTimestamp(),
+      views:0, likes:0, loves:0, minds:0, sads:0, commentCount:0
+    });
+
+    showToast('✓ Đăng bài thành công!','success');
+    btn.disabled = false; st.textContent = '';
+    ['f-title','f-content','f-excerpt'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('f-thumb').value = '';
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // TAB: LIST
+  // ══════════════════════════════════════════════════════════
+  async function renderList() {
+    document.getElementById('main-content').innerHTML = `
+      <div class="section-title">Quản lý bài viết</div>
+      <p class="section-sub">Xem, theo dõi và xóa các bài viết đã đăng.</p>
+      <div class="list-header">
+        <span class="list-count" id="art-count">Đang tải...</span>
+      </div>
+      <div id="art-list"></div>`;
+
+    const q    = query(collection(db,'articles'), orderBy('createdAt','desc'));
+    const snap = await getDocs(q);
+    const arts = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    document.getElementById('art-count').textContent = `${arts.length} bài viết`;
+
+    if (!arts.length) {
+      document.getElementById('art-list').innerHTML =
+        '<p style="color:var(--muted);text-align:center;padding:40px">Chưa có bài viết nào.</p>';
+      return;
+    }
+    document.getElementById('art-list').innerHTML = arts.map(a => `
+      <div class="article-item">
+        ${a.thumbnail ? `<img class="art-thumb" src="${a.thumbnail}" alt=""/>` : '<div class="art-thumb"></div>'}
+        <div class="art-body">
+          <div class="art-cat">${a.category||''}</div>
+          <div class="art-title">${a.title}</div>
+          <div class="art-meta">
+            <span>👁 ${a.views||0}</span>
+            <span>❤️ ${a.likes||0}</span>
+            <span>💬 ${a.commentCount||0}</span>
+            <span>${fmtDate(a.createdAt)}</span>
+          </div>
+        </div>
+        <div class="art-actions">
+          <button class="btn-view" onclick="window.open('article.html?id=${a.id}','_blank')">👁 Xem</button>
+          <button class="btn-del"  onclick="delArt('${a.id}')">🗑 Xóa</button>
+        </div>
+      </div>`).join('');
+
+    window.delArt = async (id) => {
+      if (!confirm('Xóa bài viết này?')) return;
+      await deleteDoc(doc(db,'articles',id));
+      showToast('✓ Đã xóa bài viết.','success');
+      renderList();
+    };
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // TAB: CATEGORIES
+  // ══════════════════════════════════════════════════════════
+  async function renderCats() {
+    document.getElementById('main-content').innerHTML = `
+      <div class="section-title">Quản lý Danh mục</div>
+      <p class="section-sub">Thêm, sửa, xóa danh mục — sẽ hiển thị trên thanh điều hướng trang chủ.</p>
+      <div class="form-card">
+        <div class="form-card-title">// thêm danh mục mới</div>
+        <div class="add-cat-row">
+          <input class="add-cat-input" id="new-cat" type="text" placeholder="Tên danh mục mới..."
+            onkeydown="if(event.key==='Enter') doAddCat()"/>
+          <button class="btn-primary" onclick="doAddCat()">+ Thêm</button>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">// danh mục hiện có</div>
+        <div class="cat-grid" id="cat-grid">
+          <p style="color:var(--muted);font-size:0.82rem">Đang tải...</p>
+        </div>
+      </div>`;
+
+    window.doAddCat  = doAddCat;
+    window.doDelCat  = doDelCat;
+    window.doEditCat = doEditCat;
+    window.doSaveCat = doSaveCat;
+    loadCats();
+  }
+
+  async function loadCats() {
+    const snap = await getDocs(collection(db,'categories'));
+    const cats = snap.docs.map(d => ({ id:d.id, ...d.data() }))
+                         .sort((a,b) => a.name.localeCompare(b.name,'vi'));
+    const icons = {
+      'Thời sự':'📰','Công nghệ':'💻','Kinh tế':'📈',
+      'Thể thao':'⚽','Giải trí':'🎬','Sức khỏe':'🏥','Du lịch':'✈️'
+    };
+    const grid = document.getElementById('cat-grid');
+    if (!cats.length) {
+      grid.innerHTML = '<p style="color:var(--muted);font-size:0.82rem;grid-column:1/-1">Chưa có danh mục. Hãy thêm mới!</p>';
+      return;
+    }
+    grid.innerHTML = cats.map(c => `
+      <div class="cat-card" id="cc-${c.id}">
+        <span class="cat-icon">${icons[c.name]||'📁'}</span>
+        <span class="cat-name-text" id="cn-${c.id}">${c.name}</span>
+        <div class="cat-actions">
+          <button class="cat-btn"     title="Sửa" onclick="doEditCat('${c.id}')">✏️</button>
+          <button class="cat-btn del" title="Xóa" onclick="doDelCat('${c.id}','${c.name}')">🗑</button>
+        </div>
+      </div>`).join('');
+  }
+
+  async function doAddCat() {
+    const name = document.getElementById('new-cat').value.trim();
+    if (!name) { showToast('Nhập tên danh mục!','error'); return; }
+    const id = encodeURIComponent(name.toLowerCase()) + '-' + Date.now();
+    await setDoc(doc(db,'categories',id), { name, createdAt: serverTimestamp() });
+    document.getElementById('new-cat').value = '';
+    showToast(`✓ Đã thêm "${name}"`, 'success');
+    loadCats();
+  }
+
+  async function doDelCat(id, name) {
+    if (!confirm(`Xóa danh mục "${name}"?\nCác bài viết trong danh mục này sẽ không bị xóa.`)) return;
+    await deleteDoc(doc(db,'categories',id));
+    showToast(`✓ Đã xóa "${name}"`, 'success');
+    loadCats();
+  }
+
+  function doEditCat(id) {
+    const span = document.getElementById(`cn-${id}`);
+    const val  = span.textContent;
+    span.outerHTML = `<input class="cat-name-input" id="ci-${id}" value="${val}"
+      onkeydown="if(event.key==='Enter') doSaveCat('${id}')"/>`;
+    const card = document.getElementById(`cc-${id}`);
+    card.querySelector('.cat-btn').outerHTML =
+      `<button class="cat-btn save" onclick="doSaveCat('${id}')">✅</button>`;
+    document.getElementById(`ci-${id}`).focus();
+  }
+
+  async function doSaveCat(id) {
+    const inp  = document.getElementById(`ci-${id}`);
+    const name = inp.value.trim();
+    if (!name) { showToast('Tên không được trống!','error'); return; }
+    await updateDoc(doc(db,'categories',id), { name });
+    showToast('✓ Đã cập nhật danh mục.','success');
+    loadCats();
+  }
+
+  // ── Helpers ──────────────────────────────────────────────
+  function showToast(msg, type='') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = `toast show ${type}`;
+    setTimeout(() => t.className = 'toast', 3000);
+  }
+  function fmtDate(ts) {
+    if (!ts) return '';
+    return (ts.toDate ? ts.toDate() : new Date(ts)).toLocaleDateString('vi-VN');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+/* ================================================
+   AUTH.CSS — Đăng nhập / Đăng ký User
+   ================================================ */
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Red ambient glow */
+body::before {
+  content: '';
+  position: fixed;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(192, 57, 43, 0.10) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 70%, rgba(192, 57, 43, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* ── Auth box ── */
+.auth-box {
+  background: rgba(22, 22, 26, 0.80);
+  border: 1px solid rgba(180, 180, 180, 0.14);
+  border-radius: 4px;
+  padding: 48px 44px;
+  width: 420px;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255,255,255,0.06);
+  animation: fadeUp 0.45s ease forwards;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Brand ── */
+.brand { text-align: center; margin-bottom: 34px; }
+.brand h1 {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: 3px;
+}
+.brand p {
+  color: var(--muted);
+  font-size: 0.68rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 5px;
+}
+
+/* ── Tabs ── */
+.auth-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 11px;
+  position: relative;
+  transition: color 0.2s;
+}
+.tab-btn.active { color: var(--white); }
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 2px;
+  background: var(--red);
+}
+
+/* ── Inputs ── */
+.form-group input {
+  width: 100%;
+  background: rgba(10, 10, 12, 0.62);
+  border: 1px solid rgba(160, 160, 160, 0.16);
+  border-radius: 3px;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.90rem;
+  padding: 12px 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.form-group input:focus { border-color: var(--red); }
+.form-group input::placeholder { color: var(--muted2); }
+.form-group label {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+/* ── Submit button ── */
+.btn-submit {
+  width: 100%;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 3px;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 14px;
+  margin-top: 8px;
+  transition: background 0.2s, transform 0.1s;
+}
+.btn-submit:hover  { background: var(--red2); }
+.btn-submit:active { transform: scale(0.98); }
+
+/* ── Messages ── */
+.msg {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 3px;
+  font-size: 0.80rem;
+  display: none;
+}
+.msg.error   { background: rgba(192,57,43,0.12); border: 1px solid rgba(192,57,43,0.28); color: #e74c3c; display: block; }
+.msg.success { background: rgba(39,174,96,0.10); border: 1px solid rgba(39,174,96,0.28); color: #2ecc71; display: block; }
+
+/* ── Panel toggle ── */
+.form-panel         { display: none; }
+.form-panel.active  { display: block; }
+
+/* ── Footer link ── */
+.auth-footer {
+  margin-top: 22px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.auth-footer a { color: var(--red); text-decoration: underline; }
+
+@media (max-width: 480px) {
+  .auth-box { width: 100%; margin: 16px; padding: 36px 24px; }
+}

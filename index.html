@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ABCDNEWS — Tin tức mỗi ngày</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Be+Vietnam+Pro:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="./assets/css/base.css"/>
+  <link rel="stylesheet" href="./assets/css/index.css"/>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="site-header">
+  <div class="header-top">
+    <a href="index.html" class="logo">ABCDNEWS</a>
+    <div class="header-actions">
+      <span class="user-greeting" id="user-greeting"></span>
+      <button class="btn" id="btn-auth" onclick="location.href='auth.html'">Đăng nhập</button>
+      <button class="btn btn-red" id="btn-write" style="display:none" onclick="location.href='admin.html'">+ Viết bài</button>
+      <button class="btn" id="btn-logout" style="display:none" onclick="handleLogout()">Đăng xuất</button>
+    </div>
+  </div>
+  <nav class="site-nav" id="main-nav">
+    <a href="#" class="active" onclick="filterCat(event,'')">Tất cả</a>
+    <a href="#" onclick="filterCat(event,'Thời sự')">Thời sự</a>
+    <a href="#" onclick="filterCat(event,'Công nghệ')">Công nghệ</a>
+    <a href="#" onclick="filterCat(event,'Kinh tế')">Kinh tế</a>
+    <a href="#" onclick="filterCat(event,'Thể thao')">Thể thao</a>
+    <a href="#" onclick="filterCat(event,'Giải trí')">Giải trí</a>
+    <a href="#" onclick="filterCat(event,'Sức khỏe')">Sức khỏe</a>
+    <a href="#" onclick="filterCat(event,'Du lịch')">Du lịch</a>
+  </nav>
+</header>
+
+<!-- ═══ MAIN ═══ -->
+<main class="container">
+
+  <!-- Breaking news -->
+  <div class="breaking">
+    <span class="breaking-label">🔴 Nóng</span>
+    <span class="breaking-text" id="breaking-text">Đang tải tin tức mới nhất...</span>
+  </div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="Tìm kiếm bài viết..."
+      onkeydown="if(event.key==='Enter') doSearch()"/>
+    <button onclick="doSearch()">Tìm kiếm</button>
+  </div>
+
+  <!-- Featured articles -->
+  <div id="featured-section"></div>
+
+  <!-- Articles grid -->
+  <div class="section-head">
+    <h2 id="section-title">Tin mới nhất</h2>
+    <span class="see-all" onclick="filterCat(null,'')">Xem tất cả →</span>
+  </div>
+  <div class="articles-grid" id="articles-grid">
+    <div class="skeleton skel-card"></div>
+    <div class="skeleton skel-card"></div>
+    <div class="skeleton skel-card"></div>
+  </div>
+
+</main>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="site-footer">
+  <p>© 2025 <strong>ABCDNEWS</strong> — Tin tức mỗi ngày</p>
+</footer>
+
+<script type="module">
+  import { auth, db } from './firebase-config.js';
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+  import {
+    collection, query, orderBy, limit, getDocs, where, doc, getDoc
+  } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+  let allArticles = [];
+
+  // ── Auth state ──────────────────────────────────────────
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      document.getElementById('btn-auth').style.display    = 'none';
+      document.getElementById('btn-logout').style.display  = '';
+      document.getElementById('user-greeting').textContent = `Xin chào, ${user.displayName || 'bạn'}`;
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists() && snap.data().role === 'admin') {
+        document.getElementById('btn-write').style.display = '';
+      }
+    }
+  });
+
+  window.handleLogout = async () => { await signOut(auth); location.reload(); };
+
+  // ── Load categories into nav ─────────────────────────────
+  async function loadNavCategories() {
+    const snap = await getDocs(collection(db, 'categories'));
+    const cats = snap.docs.map(d => d.data().name).sort((a,b) => a.localeCompare(b,'vi'));
+    if (!cats.length) return;
+    const nav = document.getElementById('main-nav');
+    const fixed = ['Tất cả'];
+    nav.innerHTML = `<a href="#" class="active" onclick="filterCat(event,'')">Tất cả</a>`
+      + cats.map(c => `<a href="#" onclick="filterCat(event,'${c}')">${c}</a>`).join('');
+  }
+
+  // ── Load articles ────────────────────────────────────────
+  async function loadArticles(cat = '') {
+    const grid = document.getElementById('articles-grid');
+    grid.innerHTML = '<div class="skeleton skel-card"></div>'.repeat(3);
+    const q = cat
+      ? query(collection(db,'articles'), where('category','==',cat), orderBy('createdAt','desc'), limit(12))
+      : query(collection(db,'articles'), orderBy('createdAt','desc'), limit(12));
+    const snap = await getDocs(q);
+    allArticles = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderArticles(allArticles);
+    if (!cat && allArticles.length > 0) renderFeatured(allArticles);
+    if (allArticles.length > 0) {
+      document.getElementById('breaking-text').textContent = allArticles[0].title;
+    }
+  }
+
+  // ── Render featured ──────────────────────────────────────
+  function renderFeatured(articles) {
+    const [main, side1, side2] = articles;
+    if (!main) return;
+    document.getElementById('featured-section').innerHTML = `
+      <div class="featured-grid">
+        <div class="feat-main" onclick="location.href='article.html?id=${main.id}'">
+          ${main.thumbnail ? `<img src="${main.thumbnail}" alt="${main.title}"/>` : ''}
+          <div class="feat-overlay">
+            <span class="feat-cat">${main.category || 'Tin tức'}</span>
+            <h2>${main.title}</h2>
+            <p class="feat-meta">${main.author || 'Biên tập viên'} · ${fmtDate(main.createdAt)}</p>
+          </div>
+        </div>
+        ${side1 ? `<div class="feat-side" onclick="location.href='article.html?id=${side1.id}'">
+          ${side1.thumbnail ? `<img src="${side1.thumbnail}" alt="${side1.title}"/>` : ''}
+          <div class="feat-overlay">
+            <span class="feat-cat">${side1.category||'Tin tức'}</span>
+            <h3>${side1.title}</h3>
+          </div>
+        </div>` : ''}
+        ${side2 ? `<div class="feat-side" onclick="location.href='article.html?id=${side2.id}'">
+          ${side2.thumbnail ? `<img src="${side2.thumbnail}" alt="${side2.title}"/>` : ''}
+          <div class="feat-overlay">
+            <span class="feat-cat">${side2.category||'Tin tức'}</span>
+            <h3>${side2.title}</h3>
+          </div>
+        </div>` : ''}
+      </div>`;
+  }
+
+  // ── Render article cards ─────────────────────────────────
+  function renderArticles(articles) {
+    const grid = document.getElementById('articles-grid');
+    if (!articles.length) {
+      grid.innerHTML = '<div class="empty"><p>Chưa có bài viết nào.</p></div>';
+      return;
+    }
+    grid.innerHTML = articles.map(a => `
+      <div class="article-card" onclick="location.href='article.html?id=${a.id}'">
+        <div class="card-img">
+          ${a.thumbnail ? `<img src="${a.thumbnail}" alt="${a.title}" loading="lazy"/>` : ''}
+        </div>
+        <div class="card-body">
+          <div class="card-cat">${a.category || 'Tin tức'}</div>
+          <h3 class="card-title">${a.title}</h3>
+          <p class="card-excerpt">${a.excerpt || ''}</p>
+          <div class="card-footer">
+            <span class="card-author">${a.author || 'Biên tập viên'}</span>
+            <div class="card-stats">
+              <span>👁 ${a.views||0}</span>
+              <span>❤️ ${a.likes||0}</span>
+              <span>💬 ${a.commentCount||0}</span>
+            </div>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  // ── Filter by category ───────────────────────────────────
+  window.filterCat = (e, cat) => {
+    if (e) e.preventDefault();
+    document.querySelectorAll('.site-nav a').forEach(a => a.classList.remove('active'));
+    if (e && e.target) e.target.classList.add('active');
+    document.getElementById('section-title').textContent = cat ? `Danh mục: ${cat}` : 'Tin mới nhất';
+    document.getElementById('featured-section').innerHTML = '';
+    loadArticles(cat);
+  };
+
+  // ── Search ───────────────────────────────────────────────
+  window.doSearch = () => {
+    const kw = document.getElementById('search-input').value.toLowerCase().trim();
+    if (!kw) { renderArticles(allArticles); return; }
+    const filtered = allArticles.filter(a =>
+      a.title?.toLowerCase().includes(kw) || a.excerpt?.toLowerCase().includes(kw)
+    );
+    document.getElementById('section-title').textContent = `Kết quả: "${kw}"`;
+    renderArticles(filtered);
+  };
+
+  function fmtDate(ts) {
+    if (!ts) return '';
+    return (ts.toDate ? ts.toDate() : new Date(ts)).toLocaleDateString('vi-VN');
+  }
+
+  loadNavCategories();
+  loadArticles();
+</script>
+</body>
+</html>

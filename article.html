@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ABCDNEWS — Bài viết</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Be+Vietnam+Pro:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="./assets/css/base.css"/>
+  <link rel="stylesheet" href="./assets/css/article.css"/>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="site-header">
+  <div class="header-top">
+    <a href="index.html" class="logo logo-sm">ABCDNEWS</a>
+    <div class="header-right">
+      <span class="user-info" id="user-info"></span>
+      <button class="back-btn" onclick="history.back()">← Quay lại</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ CONTENT ═══ -->
+<div class="container-sm" id="article-body">
+  <p style="color:var(--muted);text-align:center;padding:80px 0">Đang tải bài viết...</p>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { auth, db } from './firebase-config.js';
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+  import {
+    doc, getDoc, updateDoc, increment,
+    collection, addDoc, getDocs, deleteDoc,
+    query, orderBy, serverTimestamp,
+    arrayUnion, arrayRemove
+  } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+  const params    = new URLSearchParams(location.search);
+  const articleId = params.get('id');
+  let currentUser = null;
+  let articleData = null;
+
+  // ── Auth ─────────────────────────────────────────────────
+  onAuthStateChanged(auth, (user) => {
+    currentUser = user;
+    if (user) document.getElementById('user-info').textContent = user.displayName || user.email;
+    renderReactButtons();
+    renderCommentForm();
+  });
+
+  // ── Load article ─────────────────────────────────────────
+  async function loadArticle() {
+    if (!articleId) {
+      document.getElementById('article-body').innerHTML =
+        '<p style="text-align:center;color:var(--muted);padding:80px 0">Không tìm thấy bài viết.</p>';
+      return;
+    }
+    const snap = await getDoc(doc(db, 'articles', articleId));
+    if (!snap.exists()) {
+      document.getElementById('article-body').innerHTML =
+        '<p style="text-align:center;color:var(--muted);padding:80px 0">Bài viết không tồn tại.</p>';
+      return;
+    }
+    articleData = { id: snap.id, ...snap.data() };
+    document.title = `${articleData.title} — ABCDNEWS`;
+    await updateDoc(doc(db,'articles',articleId), { views: increment(1) });
+    renderArticle();
+    loadComments();
+  }
+
+  // ── Render article ───────────────────────────────────────
+  function renderArticle() {
+    const a       = articleData;
+    const initials = (a.author || 'BT').substring(0, 2).toUpperCase();
+    document.getElementById('article-body').innerHTML = `
+      <div class="article-cat">${a.category || 'Tin tức'}</div>
+      <h1 class="article-title">${a.title}</h1>
+      <div class="article-meta">
+        <div class="meta-author">
+          <div class="meta-avatar">${initials}</div>
+          <div>
+            <div class="meta-name">${a.author || 'Biên tập viên'}</div>
+            <div class="meta-date">${fmtDate(a.createdAt)}</div>
+          </div>
+        </div>
+        <div class="meta-stats">
+          <span>👁 ${a.views || 0} lượt xem</span>
+          <span>💬 ${a.commentCount || 0} bình luận</span>
+        </div>
+      </div>
+      ${a.thumbnail
+        ? `<img class="article-thumb" src="${a.thumbnail}" alt="${a.title}"/>`
+        : '<div class="no-thumb">Không có ảnh</div>'}
+      <div class="article-content">${escHtml(a.content || '')}</div>
+      <div class="reactions" id="reactions-area"></div>
+      <div class="share-bar">
+        <span class="share-label">Chia sẻ</span>
+        <button class="share-btn facebook" onclick="shareFacebook()">👍 Facebook</button>
+        <button class="share-btn twitter"  onclick="shareTwitter()">🐦 Twitter / X</button>
+        <button class="share-btn copy"     id="btn-copy" onclick="copyLink()">🔗 Sao chép link</button>
+      </div>
+      <div class="comments-section">
+        <h2 id="comments-title">Bình luận</h2>
+        <div id="comment-form-area"></div>
+        <div id="comments-list"></div>
+      </div>`;
+    renderReactButtons();
+    renderCommentForm();
+  }
+
+  // ── Reactions ────────────────────────────────────────────
+  const REACTIONS = [
+    { key: 'likes', emoji: '❤️', label: 'Thích' },
+    { key: 'loves', emoji: '🔥', label: 'Nóng' },
+    { key: 'minds', emoji: '🤔', label: 'Suy ngẫm' },
+    { key: 'sads',  emoji: '😢', label: 'Buồn' },
+  ];
+
+  function renderReactButtons() {
+    const area = document.getElementById('reactions-area');
+    if (!area || !articleData) return;
+    const myReacts = currentUser
+      ? ((articleData.userReactions || {})[currentUser.uid] || [])
+      : [];
+    area.innerHTML = REACTIONS.map(r => {
+      const active = myReacts.includes(r.key);
+      return `<button class="react-btn ${active ? 'active' : ''}" onclick="toggleReact('${r.key}')">
+        <span class="emoji">${r.emoji}</span>
+        <span>${r.label}</span>
+        <span class="count">${articleData[r.key] || 0}</span>
+      </button>`;
+    }).join('');
+  }
+
+  window.toggleReact = async (key) => {
+    if (!currentUser) { showToast('Vui lòng đăng nhập để react!'); return; }
+    const ref          = doc(db,'articles',articleId);
+    const myReacts     = ((articleData.userReactions || {})[currentUser.uid] || []);
+    const hasReacted   = myReacts.includes(key);
+    await updateDoc(ref, {
+      [key]: increment(hasReacted ? -1 : 1),
+      [`userReactions.${currentUser.uid}`]: hasReacted ? arrayRemove(key) : arrayUnion(key)
+    });
+    articleData[key] = (articleData[key] || 0) + (hasReacted ? -1 : 1);
+    if (!articleData.userReactions) articleData.userReactions = {};
+    if (!articleData.userReactions[currentUser.uid]) articleData.userReactions[currentUser.uid] = [];
+    if (hasReacted)
+      articleData.userReactions[currentUser.uid] = myReacts.filter(r => r !== key);
+    else
+      articleData.userReactions[currentUser.uid].push(key);
+    renderReactButtons();
+  };
+
+  // ── Share ────────────────────────────────────────────────
+  window.shareFacebook = () =>
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}`,'_blank','width=600,height=400');
+
+  window.shareTwitter = () => {
+    const text = encodeURIComponent((articleData?.title || '') + ' — ABCDNEWS');
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(location.href)}`,'_blank','width=600,height=400');
+  };
+
+  window.copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('btn-copy');
+      btn.classList.add('copied');
+      btn.innerHTML = '✅ Đã sao chép!';
+      setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '🔗 Sao chép link'; }, 2000);
+    } catch(e) {}
+  };
+
+  // ── Comments ─────────────────────────────────────────────
+  function renderCommentForm() {
+    const area = document.getElementById('comment-form-area');
+    if (!area) return;
+    if (!currentUser) {
+      area.innerHTML = `<div class="login-prompt">Vui lòng <a href="auth.html">đăng nhập</a> để bình luận.</div>`;
+      return;
+    }
+    area.innerHTML = `
+      <div class="comment-form">
+        <textarea id="comment-input" placeholder="Viết bình luận của bạn..."></textarea>
+        <div class="comment-form-footer">
+          <span>Đăng với tên: <strong>${currentUser.displayName || currentUser.email}</strong></span>
+          <button class="btn-comment" id="btn-send-comment" onclick="sendComment()">Gửi</button>
+        </div>
+      </div>`;
+  }
+
+  window.sendComment = async () => {
+    if (!currentUser) return;
+    const text = document.getElementById('comment-input').value.trim();
+    if (!text) return;
+    const btn = document.getElementById('btn-send-comment');
+    btn.disabled = true;
+    await addDoc(collection(db,'articles',articleId,'comments'), {
+      text, userId: currentUser.uid,
+      userName: currentUser.displayName || currentUser.email,
+      createdAt: serverTimestamp()
+    });
+    await updateDoc(doc(db,'articles',articleId), { commentCount: increment(1) });
+    document.getElementById('comment-input').value = '';
+    btn.disabled = false;
+    loadComments();
+  };
+
+  async function loadComments() {
+    const q    = query(collection(db,'articles',articleId,'comments'), orderBy('createdAt','desc'));
+    const snap = await getDocs(q);
+    const comments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const title = document.getElementById('comments-title');
+    if (title) title.textContent = `Bình luận (${comments.length})`;
+    const list = document.getElementById('comments-list');
+    if (!list) return;
+    if (!comments.length) {
+      list.innerHTML = '<div class="no-comments">Chưa có bình luận nào. Hãy là người đầu tiên!</div>';
+      return;
+    }
+    list.innerHTML = comments.map(c => {
+      const init      = (c.userName || 'U').substring(0,1).toUpperCase();
+      const canDelete = currentUser && currentUser.uid === c.userId;
+      return `<div class="comment-item">
+        <div class="com-avatar">${init}</div>
+        <div class="com-body">
+          <div class="com-header">
+            <span class="com-name">${c.userName || 'Ẩn danh'}</span>
+            <span class="com-time">${fmtDate(c.createdAt)}</span>
+            ${canDelete ? `<button class="com-delete" onclick="deleteComment('${c.id}')">✕ Xóa</button>` : ''}
+          </div>
+          <p class="com-text">${escHtml(c.text)}</p>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window.deleteComment = async (commentId) => {
+    if (!confirm('Xóa bình luận này?')) return;
+    await deleteDoc(doc(db,'articles',articleId,'comments',commentId));
+    await updateDoc(doc(db,'articles',articleId), { commentCount: increment(-1) });
+    loadComments();
+  };
+
+  // ── Helpers ──────────────────────────────────────────────
+  function fmtDate(ts) {
+    if (!ts) return '';
+    return (ts.toDate ? ts.toDate() : new Date(ts))
+      .toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  }
+  function escHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast show';
+    setTimeout(() => t.className = 'toast', 3000);
+  }
+
+  loadArticle();
+</script>
+</body>
+</html>
