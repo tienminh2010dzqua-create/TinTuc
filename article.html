@@ -7,6 +7,79 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Be+Vietnam+Pro:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="./assets/css/base.css"/>
   <link rel="stylesheet" href="./assets/css/article.css"/>
+  <style>
+    /* ── BREADCRUMB ── */
+    .breadcrumb {
+      background: rgba(0,0,0,0.25); border-bottom: 1px solid rgba(160,160,160,0.13);
+      padding: 10px 48px; font-size: 0.72rem; color: #888;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .breadcrumb a { color: #888; text-decoration: none; transition: color 0.2s; }
+    .breadcrumb a:hover { color: #c0392b; }
+    .breadcrumb .sep { color: #555; }
+    .breadcrumb .cur { color: #ececec; max-width: 400px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+    /* ── RELATED ── */
+    .related-section { margin-bottom: 44px; }
+    .related-section h2 {
+      font-family: 'Playfair Display', serif; font-size: 1.1rem; color: #fff;
+      margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid rgba(160,160,160,0.13);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .related-section h2::before { content:''; width:4px; height:18px; background:#c0392b; display:block; }
+    .related-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    .related-card {
+      background: rgba(22,22,26,0.70); border: 1px solid rgba(160,160,160,0.13);
+      border-radius: 3px; overflow: hidden; cursor: pointer;
+      transition: border-color 0.2s, transform 0.2s; backdrop-filter: blur(8px);
+    }
+    .related-card:hover { border-color: rgba(160,160,160,0.25); transform: translateY(-2px); }
+    .related-card img { width:100%; height:120px; object-fit:cover; display:block; }
+    .related-card-body { padding: 12px; }
+    .related-card-cat { font-size:0.58rem; letter-spacing:2px; text-transform:uppercase; color:#c0392b; margin-bottom:5px; }
+    .related-card-title { font-family:'Playfair Display',serif; font-size:0.87rem; line-height:1.4; color:#fff; }
+
+    /* ── FOOTER ── */
+    .site-footer { background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); border-top: 1px solid rgba(160,160,160,0.13); margin-top: auto; }
+    .footer-top {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px; padding: 48px 24px 36px;
+    }
+    .footer-logo { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:900; color:#fff; letter-spacing:3px; margin-bottom:14px; display:block; }
+    .footer-brand p { font-size:0.80rem; color:#888; line-height:1.75; max-width:260px; }
+    .footer-socials { display:flex; gap:10px; margin-top:18px; }
+    .social-btn {
+      width:36px; height:36px; border-radius:50%;
+      background:rgba(255,255,255,0.06); border:1px solid rgba(160,160,160,0.13);
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.85rem; cursor:pointer; transition:all 0.2s; color:#888; text-decoration:none;
+    }
+    .social-btn:hover { background:#c0392b; border-color:#c0392b; color:#fff; }
+    .footer-col h4 {
+      font-size:0.68rem; letter-spacing:3px; text-transform:uppercase;
+      color:#fff; font-weight:600; margin-bottom:16px;
+      padding-bottom:10px; border-bottom:1px solid rgba(160,160,160,0.13);
+    }
+    .footer-col ul { list-style:none; }
+    .footer-col ul li { margin-bottom:10px; }
+    .footer-col ul li a { font-size:0.80rem; color:#888; transition:color 0.2s; cursor:pointer; text-decoration:none; }
+    .footer-col ul li a:hover { color:#c0392b; }
+    .footer-bottom {
+      border-top:1px solid rgba(160,160,160,0.13); padding:18px 24px;
+      display:flex; align-items:center; justify-content:space-between;
+      max-width:1200px; margin:0 auto;
+    }
+    .footer-bottom p { font-size:0.72rem; color:#555; }
+    .footer-bottom strong { color:#fff; font-family:'Playfair Display',serif; }
+    .footer-bottom-links { display:flex; gap:20px; }
+    .footer-bottom-links a { font-size:0.70rem; color:#555; transition:color 0.2s; text-decoration:none; }
+    .footer-bottom-links a:hover { color:#c0392b; }
+    body { display:flex; flex-direction:column; min-height:100vh; }
+    .page-wrap { flex:1; }
+    @media(max-width:900px){ .related-grid { grid-template-columns:1fr; } .footer-top { grid-template-columns:1fr 1fr; gap:24px; } }
+    @media(max-width:600px){ .breadcrumb { padding:10px 16px; } .footer-top { grid-template-columns:1fr; padding:32px 16px 24px; } .footer-bottom { flex-direction:column; gap:10px; text-align:center; padding:16px; } }
+  </style>
 </head>
 <body>
 
@@ -16,15 +89,79 @@
     <a href="index.html" class="logo logo-sm">ABCDNEWS</a>
     <div class="header-right">
       <span class="user-info" id="user-info"></span>
-      <button class="back-btn" onclick="history.back()">← Quay lại</button>
+      <button class="back-btn" onclick="location.href='index.html'">← Trang chủ</button>
     </div>
   </div>
 </header>
 
+<!-- Breadcrumb -->
+<div class="breadcrumb">
+  <a href="index.html">Trang chủ</a>
+  <span class="sep">›</span>
+  <span id="bc-cat">...</span>
+  <span class="sep">›</span>
+  <span class="cur" id="bc-title">Đang tải...</span>
+</div>
+
 <!-- ═══ CONTENT ═══ -->
+<div class="page-wrap">
 <div class="container-sm" id="article-body">
   <p style="color:var(--muted);text-align:center;padding:80px 0">Đang tải bài viết...</p>
 </div>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="site-footer">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <span class="footer-logo">ABCDNEWS</span>
+      <p>Trang báo điện tử cung cấp thông tin nhanh chóng, chính xác và đa dạng về mọi lĩnh vực trong cuộc sống.</p>
+      <div class="footer-socials">
+        <a class="social-btn">f</a>
+        <a class="social-btn">▶</a>
+        <a class="social-btn">𝕏</a>
+        <a class="social-btn">Z</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Danh mục</h4>
+      <ul>
+        <li><a href="index.html">Thời sự</a></li>
+        <li><a href="index.html">Công nghệ</a></li>
+        <li><a href="index.html">Kinh tế</a></li>
+        <li><a href="index.html">Thể thao</a></li>
+        <li><a href="index.html">Giải trí</a></li>
+        <li><a href="index.html">Sức khỏe</a></li>
+        <li><a href="index.html">Du lịch</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Về chúng tôi</h4>
+      <ul>
+        <li><a href="#">Giới thiệu</a></li>
+        <li><a href="#">Tòa soạn</a></li>
+        <li><a href="#">Liên hệ</a></li>
+        <li><a href="admin-login.html">Dành cho Admin</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Hỗ trợ</h4>
+      <ul>
+        <li><a href="#">Điều khoản sử dụng</a></li>
+        <li><a href="#">Chính sách bảo mật</a></li>
+        <li><a href="auth.html">Đăng ký tài khoản</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 <strong>ABCDNEWS</strong> — All rights reserved.</p>
+    <div class="footer-bottom-links">
+      <a href="#">Điều khoản</a>
+      <a href="#">Bảo mật</a>
+      <a href="#">Sitemap</a>
+    </div>
+  </div>
+</footer>
 
 <div class="toast" id="toast"></div>
 
@@ -66,9 +203,15 @@
     }
     articleData = { id: snap.id, ...snap.data() };
     document.title = `${articleData.title} — ABCDNEWS`;
+    // Breadcrumb
+    const bcCat = document.getElementById('bc-cat');
+    const bcTitle = document.getElementById('bc-title');
+    if (bcCat) bcCat.textContent = articleData.category || 'Tin tức';
+    if (bcTitle) bcTitle.textContent = articleData.title;
     await updateDoc(doc(db,'articles',articleId), { views: increment(1) });
     renderArticle();
     loadComments();
+    loadRelated();
   }
 
   // ── Render article ───────────────────────────────────────
@@ -101,6 +244,10 @@
         <button class="share-btn facebook" onclick="shareFacebook()">👍 Facebook</button>
         <button class="share-btn twitter"  onclick="shareTwitter()">🐦 Twitter / X</button>
         <button class="share-btn copy"     id="btn-copy" onclick="copyLink()">🔗 Sao chép link</button>
+      </div>
+      <div class="related-section">
+        <h2>Bài viết liên quan</h2>
+        <div class="related-grid" id="related-grid"><p style="color:var(--muted);font-size:0.82rem">Đang tải...</p></div>
       </div>
       <div class="comments-section">
         <h2 id="comments-title">Bình luận</h2>
@@ -257,6 +404,29 @@
     const t = document.getElementById('toast');
     t.textContent = msg; t.className = 'toast show';
     setTimeout(() => t.className = 'toast', 3000);
+  }
+
+  // ── Related articles ─────────────────────────────────────
+  async function loadRelated() {
+    if (!articleData) return;
+    const grid = document.getElementById('related-grid');
+    if (!grid) return;
+    try {
+      const { query: q, where, limit: lm } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
+      const snap = await getDocs(
+        q(collection(db,'articles'), where('category','==', articleData.category), orderBy('createdAt','desc'), lm(4))
+      );
+      const related = snap.docs.map(d=>({id:d.id,...d.data()})).filter(a=>a.id!==articleId).slice(0,3);
+      if (!related.length) { grid.innerHTML='<p style="color:var(--muted);font-size:0.82rem">Chưa có bài viết liên quan.</p>'; return; }
+      grid.innerHTML = related.map(a=>`
+        <div class="related-card" onclick="location.href='article.html?id=${a.id}'">
+          ${a.thumbnail?`<img src="${a.thumbnail}" alt="${a.title}" loading="lazy"/>`:''}
+          <div class="related-card-body">
+            <div class="related-card-cat">${a.category||'Tin tức'}</div>
+            <div class="related-card-title">${a.title}</div>
+          </div>
+        </div>`).join('');
+    } catch(e) { grid.innerHTML=''; }
   }
 
   loadArticle();
