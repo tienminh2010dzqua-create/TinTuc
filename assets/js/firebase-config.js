@@ -1,3 +1,4 @@
+<script type="module">
 // ========================================
 // 🔥 CẤU HÌNH FIREBASE - THAY THẾ THÔNG TIN CỦA BẠN
 // ========================================
@@ -21,9 +22,8 @@ const firebaseConfig = {
   appId: "1:516770387411:web:a52d7739e2c12ed8ab0b26",
 };
 
-
-
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+</script>
