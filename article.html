@@ -1,162 +1,877 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ABCDNEWS — Bài viết</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="./assets/css/article.css"/>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ABCDNEWS — Bài viết</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/css/article.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      body {
+        background:
+          radial-gradient(ellipse at 20% 5%, #787878 0%, transparent 50%),
+          radial-gradient(ellipse at 78% 22%, #525252 0%, transparent 44%),
+          radial-gradient(ellipse at 48% 62%, #2e2e2e 0%, transparent 55%),
+          linear-gradient(
+            165deg,
+            #686868 0%,
+            #3c3c3c 25%,
+            #1a1a1a 52%,
+            #070707 100%
+          );
+        background-attachment: fixed;
+        min-height: 100vh;
+        color: #ececec;
+        font-family: "Be Vietnam Pro", sans-serif;
+        display: flex;
+        flex-direction: column;
+      }
 
-<!-- HEADER -->
-<header>
-  <div class="header-top">
-    <a href="index.html" class="logo">ABCDNEWS</a>
-    <div class="header-right">
-      <span class="user-info" id="user-info"></span>
-      <button class="btn-back" onclick="location.href='index.html'">← Trang chủ</button>
+      /* HEADER */
+      header {
+        border-bottom: 1px solid rgba(160, 160, 160, 0.13);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(10, 10, 12, 0.92);
+        backdrop-filter: blur(18px);
+      }
+      .header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 48px;
+      }
+      .logo {
+        font-family: "Playfair Display", serif;
+        font-size: 1.6rem;
+        font-weight: 900;
+        color: #fff;
+        letter-spacing: 3px;
+      }
+      .header-right {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .user-info {
+        font-size: 0.76rem;
+        color: #888;
+      }
+      .btn-back {
+        background: none;
+        border: 1px solid rgba(160, 160, 160, 0.22);
+        color: #ececec;
+        font-family: "Be Vietnam Pro", sans-serif;
+        font-size: 0.72rem;
+        font-weight: 500;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 8px 18px;
+        border-radius: 2px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-back:hover {
+        border-color: #c0392b;
+        color: #c0392b;
+      }
+
+      /* BREADCRUMB */
+      .breadcrumb {
+        background: rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid rgba(160, 160, 160, 0.1);
+        padding: 10px 48px;
+        font-size: 0.72rem;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .breadcrumb a {
+        color: #666;
+        transition: color 0.2s;
+      }
+      .breadcrumb a:hover {
+        color: #c0392b;
+      }
+      .sep {
+        color: #444;
+      }
+      .bc-cat {
+        color: #c0392b;
+      }
+      .bc-cur {
+        color: #ececec;
+        max-width: 500px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      /* LAYOUT */
+      .page-wrap {
+        flex: 1;
+      }
+      .container {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 44px 24px;
+      }
+
+      /* ARTICLE */
+      .article-cat {
+        font-size: 0.64rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #c0392b;
+        font-weight: 700;
+        margin-bottom: 14px;
+      }
+      .article-title {
+        font-family: "Playfair Display", serif;
+        font-size: 2.2rem;
+        line-height: 1.25;
+        color: #fff;
+        margin-bottom: 20px;
+      }
+      .article-meta {
+        display: flex;
+        gap: 22px;
+        align-items: center;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(160, 160, 160, 0.13);
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+      }
+      .meta-author {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .meta-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #c0392b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.86rem;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
+      }
+      .meta-name {
+        font-size: 0.84rem;
+        color: #fff;
+        font-weight: 500;
+      }
+      .meta-date {
+        font-size: 0.7rem;
+        color: #888;
+      }
+      .meta-stats {
+        display: flex;
+        gap: 14px;
+        margin-left: auto;
+        font-size: 0.74rem;
+        color: #888;
+      }
+      .article-thumb {
+        width: 100%;
+        max-height: 500px;
+        object-fit: cover;
+        border-radius: 3px;
+        margin-bottom: 32px;
+        display: block;
+      }
+      .no-thumb {
+        width: 100%;
+        height: 240px;
+        background: rgba(34, 34, 38, 0.72);
+        border-radius: 3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-size: 2rem;
+        margin-bottom: 32px;
+      }
+      .article-content {
+        font-size: 1.05rem;
+        line-height: 1.9;
+        color: #d0d0d0;
+        margin-bottom: 36px;
+      }
+      .article-content p {
+        margin-bottom: 18px;
+      }
+
+      /* REACTIONS */
+      .reactions-wrap {
+        padding: 22px 0;
+        border-top: 1px solid rgba(160, 160, 160, 0.13);
+        border-bottom: 1px solid rgba(160, 160, 160, 0.13);
+        margin-bottom: 20px;
+      }
+      .reactions-label {
+        font-size: 0.65rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #666;
+        margin-bottom: 12px;
+      }
+      .reactions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .react-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(22, 22, 26, 0.72);
+        border: 1px solid rgba(160, 160, 160, 0.13);
+        border-radius: 24px;
+        padding: 9px 20px;
+        cursor: pointer;
+        font-family: "Be Vietnam Pro", sans-serif;
+        font-size: 0.85rem;
+        color: #888;
+        transition: all 0.25s;
+        user-select: none;
+      }
+      .react-btn:hover {
+        border-color: rgba(160, 160, 160, 0.3);
+        color: #ececec;
+        transform: scale(1.05);
+      }
+      .react-btn.active {
+        border-color: #c0392b;
+        color: #c0392b;
+        background: rgba(192, 57, 43, 0.12);
+      }
+      .react-btn .emoji {
+        font-size: 1.15rem;
+      }
+      .react-btn .count {
+        font-weight: 700;
+        font-size: 0.82rem;
+        min-width: 16px;
+      }
+      .react-saving {
+        font-size: 0.68rem;
+        color: #888;
+        margin-top: 8px;
+        height: 16px;
+      }
+
+      /* SHARE */
+      .share-bar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 18px 0;
+        border-bottom: 1px solid rgba(160, 160, 160, 0.13);
+        margin-bottom: 36px;
+        flex-wrap: wrap;
+      }
+      .share-label {
+        font-size: 0.62rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #666;
+        font-weight: 600;
+        margin-right: 4px;
+      }
+      .share-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(22, 22, 26, 0.7);
+        border: 1px solid rgba(160, 160, 160, 0.13);
+        border-radius: 22px;
+        padding: 7px 16px;
+        cursor: pointer;
+        font-family: "Be Vietnam Pro", sans-serif;
+        font-size: 0.76rem;
+        color: #888;
+        transition: all 0.2s;
+      }
+      .share-btn:hover {
+        border-color: rgba(160, 160, 160, 0.3);
+        color: #ececec;
+      }
+      .share-btn.facebook:hover {
+        border-color: #1877f2;
+        color: #1877f2;
+      }
+      .share-btn.twitter:hover {
+        border-color: #1da1f2;
+        color: #1da1f2;
+      }
+      .share-btn.copy:hover,
+      .share-btn.copy.copied {
+        border-color: #27ae60;
+        color: #27ae60;
+      }
+
+      /* COMMENTS */
+      .comments-section h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.2rem;
+        color: #fff;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .comments-section h2::before {
+        content: "";
+        width: 4px;
+        height: 20px;
+        background: #c0392b;
+        display: block;
+      }
+      .comment-form {
+        background: rgba(22, 22, 26, 0.74);
+        border: 1px solid rgba(160, 160, 160, 0.13);
+        border-radius: 3px;
+        padding: 18px;
+        margin-bottom: 24px;
+      }
+      .comment-form textarea {
+        width: 100%;
+        background: rgba(10, 10, 12, 0.62);
+        border: 1px solid rgba(160, 160, 160, 0.15);
+        border-radius: 3px;
+        color: #e0e0e0;
+        font-family: "Be Vietnam Pro", sans-serif;
+        font-size: 0.86rem;
+        line-height: 1.65;
+        padding: 11px 14px;
+        outline: none;
+        resize: vertical;
+        min-height: 80px;
+        transition: border-color 0.2s;
+      }
+      .comment-form textarea:focus {
+        border-color: #c0392b;
+      }
+      .comment-form-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 12px;
+      }
+      .comment-form-footer span {
+        font-size: 0.74rem;
+        color: #888;
+      }
+      .btn-comment {
+        background: #c0392b;
+        border: none;
+        color: #fff;
+        font-family: "Be Vietnam Pro", sans-serif;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 9px 20px;
+        border-radius: 2px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn-comment:hover {
+        background: #a93226;
+      }
+      .btn-comment:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .comment-item {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 20px;
+        animation: fadeIn 0.35s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .com-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+      .com-avatar.sample {
+        background: rgba(60, 60, 70, 0.9);
+        color: #aaa;
+      }
+      .com-avatar.user {
+        background: #c0392b;
+        color: #fff;
+      }
+      .com-body {
+        flex: 1;
+      }
+      .com-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 6px;
+      }
+      .com-name {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #fff;
+      }
+      .com-badge {
+        font-size: 0.58rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        background: rgba(192, 57, 43, 0.15);
+        color: #c0392b;
+        border: 1px solid rgba(192, 57, 43, 0.25);
+        padding: 2px 7px;
+        border-radius: 10px;
+      }
+      .com-time {
+        font-size: 0.68rem;
+        color: #555;
+      }
+      .com-text {
+        font-size: 0.84rem;
+        line-height: 1.65;
+        color: #c0c0c0;
+      }
+      .com-delete {
+        background: none;
+        border: none;
+        color: #555;
+        font-size: 0.68rem;
+        margin-left: auto;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+      .com-delete:hover {
+        color: #c0392b;
+      }
+      .com-divider {
+        border: none;
+        border-top: 1px dashed rgba(160, 160, 160, 0.1);
+        margin: 4px 0 20px;
+      }
+      .login-prompt {
+        background: rgba(20, 20, 24, 0.72);
+        border: 1px solid rgba(160, 160, 160, 0.13);
+        border-radius: 3px;
+        padding: 18px;
+        text-align: center;
+        color: #888;
+        font-size: 0.83rem;
+        margin-bottom: 24px;
+      }
+      .login-prompt a {
+        color: #c0392b;
+        text-decoration: underline;
+      }
+      .no-comments {
+        text-align: center;
+        color: #888;
+        padding: 36px;
+        font-size: 0.83rem;
+      }
+
+      /* TOAST */
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: rgba(18, 18, 22, 0.95);
+        border: 1px solid rgba(160, 160, 160, 0.13);
+        border-left: 3px solid #c0392b;
+        border-radius: 2px;
+        padding: 12px 20px;
+        font-size: 0.74rem;
+        color: #ececec;
+        transform: translateY(80px);
+        opacity: 0;
+        transition: all 0.3s;
+        z-index: 999;
+      }
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .toast.ok {
+        border-left-color: #27ae60;
+      }
+
+      /* FOOTER */
+      footer {
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(12px);
+        border-top: 1px solid rgba(160, 160, 160, 0.13);
+      }
+      .footer-top {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 40px;
+        padding: 48px 24px 36px;
+      }
+      .footer-logo {
+        font-family: "Playfair Display", serif;
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: #fff;
+        letter-spacing: 3px;
+        margin-bottom: 14px;
+        display: block;
+      }
+      .footer-brand p {
+        font-size: 0.8rem;
+        color: #888;
+        line-height: 1.75;
+        max-width: 260px;
+      }
+      .footer-socials {
+        display: flex;
+        gap: 10px;
+        margin-top: 18px;
+      }
+      .social-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(160, 160, 160, 0.13);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #888;
+      }
+      .social-btn:hover {
+        background: #c0392b;
+        border-color: #c0392b;
+        color: #fff;
+      }
+      .footer-col h4 {
+        font-size: 0.68rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #fff;
+        font-weight: 600;
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(160, 160, 160, 0.13);
+      }
+      .footer-col ul {
+        list-style: none;
+      }
+      .footer-col ul li {
+        margin-bottom: 10px;
+      }
+      .footer-col ul li a {
+        font-size: 0.8rem;
+        color: #888;
+        transition: color 0.2s;
+      }
+      .footer-col ul li a:hover {
+        color: #c0392b;
+      }
+      .footer-bottom {
+        border-top: 1px solid rgba(160, 160, 160, 0.13);
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .footer-bottom p {
+        font-size: 0.72rem;
+        color: #555;
+      }
+      .footer-bottom strong {
+        color: #fff;
+        font-family: "Playfair Display", serif;
+      }
+      .footer-links {
+        display: flex;
+        gap: 20px;
+      }
+      .footer-links a {
+        font-size: 0.7rem;
+        color: #555;
+        transition: color 0.2s;
+      }
+      .footer-links a:hover {
+        color: #c0392b;
+      }
+
+      @media (max-width: 768px) {
+        .header-top,
+        .breadcrumb {
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+        .container {
+          padding: 28px 16px;
+        }
+        .article-title {
+          font-size: 1.55rem;
+        }
+        .footer-top {
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+          padding: 32px 16px 24px;
+        }
+        .footer-bottom {
+          flex-direction: column;
+          gap: 10px;
+          text-align: center;
+          padding: 16px;
+        }
+      }
+      @media (max-width: 500px) {
+        .footer-top {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- HEADER -->
+    <header>
+      <div class="header-top">
+        <a href="index.html" class="logo">ABCDNEWS</a>
+        <div class="header-right">
+          <span class="user-info" id="user-info"></span>
+          <button class="btn-back" onclick="location.href = 'index.html'">
+            ← Trang chủ
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb">
+      <a href="index.html">Trang chủ</a>
+      <span class="sep">›</span>
+      <span class="bc-cat" id="bc-cat">...</span>
+      <span class="sep">›</span>
+      <span class="bc-cur" id="bc-title">Đang tải...</span>
     </div>
-  </div>
-</header>
 
-<!-- BREADCRUMB -->
-<div class="breadcrumb">
-  <a href="index.html">Trang chủ</a>
-  <span class="sep">›</span>
-  <span class="bc-cat" id="bc-cat">...</span>
-  <span class="sep">›</span>
-  <span class="bc-cur" id="bc-title">Đang tải...</span>
-</div>
-
-<!-- CONTENT -->
-<div class="page-wrap">
-  <div class="container" id="article-body">
-    <p style="color:#888;text-align:center;padding:80px 0">Đang tải bài viết...</p>
-  </div>
-</div>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-top">
-    <div class="footer-brand">
-      <span class="footer-logo">ABCDNEWS</span>
-      <p>Trang báo điện tử cung cấp thông tin nhanh chóng, chính xác và đa dạng về mọi lĩnh vực trong cuộc sống.</p>
-      <div class="footer-socials">
-        <a class="social-btn">f</a>
-        <a class="social-btn">▶</a>
-        <a class="social-btn">𝕏</a>
-        <a class="social-btn">Z</a>
+    <!-- CONTENT -->
+    <div class="page-wrap">
+      <div class="container" id="article-body">
+        <p style="color: #888; text-align: center; padding: 80px 0">
+          Đang tải bài viết...
+        </p>
       </div>
     </div>
-    <div class="footer-col">
-      <h4>Danh mục</h4>
-      <ul>
-        <li><a href="index.html">Thời sự</a></li>
-        <li><a href="index.html">Công nghệ</a></li>
-        <li><a href="index.html">Kinh tế</a></li>
-        <li><a href="index.html">Thể thao</a></li>
-        <li><a href="index.html">Giải trí</a></li>
-        <li><a href="index.html">Sức khỏe</a></li>
-        <li><a href="index.html">Du lịch</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Về chúng tôi</h4>
-      <ul>
-        <li><a href="#">Giới thiệu</a></li>
-        <li><a href="#">Tòa soạn</a></li>
-        <li><a href="#">Liên hệ</a></li>
-        <li><a href="admin-login.html">Dành cho Admin</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Hỗ trợ</h4>
-      <ul>
-        <li><a href="#">Điều khoản sử dụng</a></li>
-        <li><a href="#">Chính sách bảo mật</a></li>
-        <li><a href="auth.html">Đăng ký tài khoản</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>© 2025 <strong>ABCDNEWS</strong> — All rights reserved.</p>
-    <div class="footer-links">
-      <a href="#">Điều khoản</a>
-      <a href="#">Bảo mật</a>
-      <a href="#">Sitemap</a>
-    </div>
-  </div>
-</footer>
 
-<div class="toast" id="toast"></div>
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-top">
+        <div class="footer-brand">
+          <span class="footer-logo">ABCDNEWS</span>
+          <p>
+            Trang báo điện tử cung cấp thông tin nhanh chóng, chính xác và đa
+            dạng về mọi lĩnh vực trong cuộc sống.
+          </p>
+          <div class="footer-socials">
+            <a class="social-btn" title="Facebook">f</a>
+            <a class="social-btn" title="YouTube">▶</a>
+            <a class="social-btn" title="Twitter">𝕏</a>
+            <a class="social-btn" title="Zalo">Z</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Danh mục</h4>
+          <ul>
+            <li><a href="index.html">Thời sự</a></li>
+            <li><a href="index.html">Công nghệ</a></li>
+            <li><a href="index.html">Kinh tế</a></li>
+            <li><a href="index.html">Thể thao</a></li>
+            <li><a href="index.html">Giải trí</a></li>
+            <li><a href="index.html">Sức khỏe</a></li>
+            <li><a href="index.html">Du lịch</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Về chúng tôi</h4>
+          <ul>
+            <li><a href="about.html">Giới thiệu</a></li>
+            <li><a href="about.html#toasoang">Tòa soạn</a></li>
+            <li><a href="contact.html">Liên hệ</a></li>
+            <li><a href="contact.html#ads">Quảng cáo</a></li>
+            <li><a href="admin-login.html">Dành cho Admin</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Hỗ trợ</h4>
+          <ul>
+            <li><a href="terms.html">Điều khoản sử dụng</a></li>
+            <li><a href="privacy.html">Chính sách bảo mật</a></li>
+            <li><a href="terms.html#community">Quy tắc cộng đồng</a></li>
+            <li><a href="auth.html">Đăng ký tài khoản</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 <strong>ABCDNEWS</strong> — All rights reserved.</p>
+        <div class="footer-links">
+          <a href="terms.html">Điều khoản</a>
+          <a href="privacy.html">Bảo mật</a>
+          <a href="#">Sitemap</a>
+        </div>
+      </div>
+    </footer>
 
-<script type="module">
-  import { auth, db } from './firebase-config.js';
-  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-  import {
-    doc, getDoc, updateDoc, increment,
-    collection, addDoc, getDocs, deleteDoc,
-    query, orderBy, where, limit,
-    serverTimestamp, arrayUnion, arrayRemove
-  } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+    <div class="toast" id="toast"></div>
 
-  const params    = new URLSearchParams(location.search);
-  const articleId = params.get('id');
-  let currentUser = null;
-  let articleData = null;
+    <script type="module">
+      import { auth, db } from "./firebase-config.js";
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+      import {
+        doc,
+        getDoc,
+        setDoc,
+        updateDoc,
+        increment,
+        collection,
+        addDoc,
+        getDocs,
+        deleteDoc,
+        query,
+        orderBy,
+        serverTimestamp,
+        arrayUnion,
+        arrayRemove,
+      } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-  // Auth
-  onAuthStateChanged(auth, (user) => {
-    currentUser = user;
-    if (user) document.getElementById('user-info').textContent = user.displayName || user.email;
-    renderReactButtons();
-    renderCommentForm();
-  });
+      const params = new URLSearchParams(location.search);
+      const articleId = params.get("id");
+      let currentUser = null;
+      let articleData = null;
 
-  // Load article
-  async function loadArticle() {
-    if (!articleId) { showErr('Không tìm thấy bài viết.'); return; }
-    try {
-      const snap = await getDoc(doc(db, 'articles', articleId));
-      if (!snap.exists()) { showErr('Bài viết không tồn tại.'); return; }
-      articleData = { id: snap.id, ...snap.data() };
-      document.title = `${articleData.title} — ABCDNEWS`;
-      document.getElementById('bc-cat').textContent   = articleData.category || 'Tin tức';
-      document.getElementById('bc-title').textContent = articleData.title;
-      updateDoc(doc(db,'articles',articleId), { views: increment(1) }).catch(()=>{});
-      renderArticle();
-      loadComments();
-      loadRelated();
-    } catch(e) {
-      showErr('Có lỗi xảy ra khi tải bài viết. Vui lòng thử lại.');
-      console.error(e);
-    }
-  }
+      // ── Bình luận mẫu sẵn ──────────────────────────────────
+      const SAMPLE_COMMENTS = [
+        {
+          name: "Trần Minh Tuấn",
+          text: "Bài viết rất hay và bổ ích! Cảm ơn tác giả đã chia sẻ thông tin chi tiết như vậy. Mình đã đọc đi đọc lại nhiều lần.",
+          time: "2 giờ trước",
+          badge: false,
+        },
+        {
+          name: "Nguyễn Thu Hà",
+          text: "Thông tin cập nhật nhanh, chính xác. ABCDNEWS luôn là trang mình tin tưởng mỗi sáng. 👍",
+          time: "5 giờ trước",
+          badge: false,
+        },
+        {
+          name: "Lê Hoàng Nam",
+          text: "Mình mong tác giả sẽ có thêm bài viết sâu hơn về chủ đề này. Rất nhiều người quan tâm đấy!",
+          time: "1 ngày trước",
+          badge: true,
+        },
+      ];
 
-  function showErr(msg) {
-    document.getElementById('article-body').innerHTML =
-      `<p style="color:#888;text-align:center;padding:80px 0">${msg}</p>`;
-  }
+      // ── Auth ───────────────────────────────────────────────
+      onAuthStateChanged(auth, (user) => {
+        currentUser = user;
+        if (user)
+          document.getElementById("user-info").textContent =
+            user.displayName || user.email;
+        renderReactButtons();
+        renderCommentForm();
+      });
 
-  // Render article
-  function renderArticle() {
-    const a = articleData;
-    const initials = (a.author || 'BT').substring(0, 2).toUpperCase();
-    // Format nội dung: xuống dòng -> <p>
-    const content = (a.content || '')
-      .split('\n\n').filter(p => p.trim())
-      .map(p => `<p>${p.replace(/\n/g,'<br/>')}</p>`)
-      .join('') || `<p>${(a.content||'').replace(/\n/g,'<br/>')}</p>`;
+      // ── Load article ───────────────────────────────────────
+      async function loadArticle() {
+        if (!articleId) {
+          showErr("Không tìm thấy bài viết.");
+          return;
+        }
+        try {
+          const snap = await getDoc(doc(db, "articles", articleId));
+          if (!snap.exists()) {
+            showErr("Bài viết không tồn tại.");
+            return;
+          }
+          articleData = { id: snap.id, ...snap.data() };
+          document.title = `${articleData.title} — ABCDNEWS`;
+          document.getElementById("bc-cat").textContent =
+            articleData.category || "Tin tức";
+          document.getElementById("bc-title").textContent = articleData.title;
+          updateDoc(doc(db, "articles", articleId), {
+            views: increment(1),
+          }).catch(() => {});
+          renderArticle();
+          loadComments();
+        } catch (e) {
+          showErr("Có lỗi xảy ra. Vui lòng thử lại.");
+          console.error(e);
+        }
+      }
 
-    document.getElementById('article-body').innerHTML = `
-      <div class="article-cat">${a.category || 'Tin tức'}</div>
+      function showErr(msg) {
+        document.getElementById("article-body").innerHTML =
+          `<p style="color:#888;text-align:center;padding:80px 0">${msg}</p>`;
+      }
+
+      // ── Render article ─────────────────────────────────────
+      function renderArticle() {
+        const a = articleData;
+        const initials = (a.author || "BT").substring(0, 2).toUpperCase();
+        const content =
+          (a.content || "")
+            .split("\n\n")
+            .filter((p) => p.trim())
+            .map((p) => `<p>${p.replace(/\n/g, "<br/>")}</p>`)
+            .join("") || `<p>${(a.content || "").replace(/\n/g, "<br/>")}</p>`;
+
+        document.getElementById("article-body").innerHTML = `
+      <div class="article-cat">${a.category || "Tin tức"}</div>
       <h1 class="article-title">${a.title}</h1>
       <div class="article-meta">
         <div class="meta-author">
           <div class="meta-avatar">${initials}</div>
           <div>
-            <div class="meta-name">${a.author || 'Biên tập viên'}</div>
+            <div class="meta-name">${a.author || "Biên tập viên"}</div>
             <div class="meta-date">${fmtDate(a.createdAt)}</div>
           </div>
         </div>
@@ -165,190 +880,313 @@
           <span>💬 ${a.commentCount || 0} bình luận</span>
         </div>
       </div>
-      ${a.thumbnail ? `<img class="article-thumb" src="${a.thumbnail}" alt="${a.title}"/>` : '<div class="no-thumb">📰</div>'}
+      ${
+        a.thumbnail
+          ? `<img class="article-thumb" src="${a.thumbnail}" alt="${a.title}"/>`
+          : '<div class="no-thumb">📰</div>'
+      }
       <div class="article-content">${content}</div>
-      <div class="reactions" id="reactions-area"></div>
+
+      <!-- REACTIONS -->
+      <div class="reactions-wrap">
+        <div class="reactions-label">Cảm xúc của bạn về bài viết này</div>
+        <div class="reactions" id="reactions-area"></div>
+        <div class="react-saving" id="react-saving"></div>
+      </div>
+
+      <!-- SHARE -->
       <div class="share-bar">
         <span class="share-label">Chia sẻ</span>
         <button class="share-btn facebook" onclick="shareFB()">👍 Facebook</button>
         <button class="share-btn twitter"  onclick="shareTW()">🐦 Twitter / X</button>
         <button class="share-btn copy" id="btn-copy" onclick="copyLink()">🔗 Sao chép link</button>
       </div>
-      <div class="related-section">
-        <h2>Bài viết liên quan</h2>
-        <div class="related-grid" id="related-grid"><p style="color:#888;font-size:0.82rem">Đang tải...</p></div>
-      </div>
+
+      <!-- COMMENTS -->
       <div class="comments-section">
         <h2 id="comments-title">Bình luận</h2>
         <div id="comment-form-area"></div>
         <div id="comments-list"></div>
       </div>`;
-    renderReactButtons();
-    renderCommentForm();
-  }
 
-  // Related
-  async function loadRelated() {
-    const grid = document.getElementById('related-grid');
-    if (!grid || !articleData) return;
-    try {
-      const snap = await getDocs(
-        query(collection(db,'articles'),
-          where('category','==', articleData.category),
-          orderBy('createdAt','desc'), limit(4))
-      );
-      const related = snap.docs.map(d=>({id:d.id,...d.data()}))
-        .filter(a => a.id !== articleId).slice(0,3);
-      if (!related.length) {
-        grid.innerHTML = '<p style="color:#888;font-size:0.82rem;grid-column:1/-1">Chưa có bài viết liên quan.</p>';
-        return;
+        renderReactButtons();
+        renderCommentForm();
       }
-      grid.innerHTML = related.map(a => `
-        <div class="related-card" onclick="location.href='article.html?id=${a.id}'">
-          ${a.thumbnail ? `<img class="related-img" src="${a.thumbnail}" alt="${a.title}" loading="lazy"/>` : '<div class="related-no-img">📰</div>'}
-          <div class="related-body">
-            <div class="related-cat">${a.category||'Tin tức'}</div>
-            <div class="related-title">${a.title}</div>
-            <div class="related-date">${fmtDate(a.createdAt)}</div>
-          </div>
-        </div>`).join('');
-    } catch(e) { grid.innerHTML = ''; }
-  }
 
-  // Reactions
-  const REACTIONS = [
-    {key:'likes',emoji:'❤️',label:'Thích'},
-    {key:'loves',emoji:'🔥',label:'Nóng'},
-    {key:'minds',emoji:'🤔',label:'Suy ngẫm'},
-    {key:'sads', emoji:'😢',label:'Buồn'},
-  ];
-  function renderReactButtons() {
-    const area = document.getElementById('reactions-area');
-    if (!area || !articleData) return;
-    const myReacts = currentUser ? ((articleData.userReactions||{})[currentUser.uid]||[]) : [];
-    area.innerHTML = REACTIONS.map(r => {
-      const active = myReacts.includes(r.key);
-      return `<button class="react-btn ${active?'active':''}" onclick="toggleReact('${r.key}')">
-        <span>${r.emoji}</span><span>${r.label}</span>
-        <span class="count">${articleData[r.key]||0}</span>
+      // ── REACTIONS — lưu vào Firestore ─────────────────────
+      const REACTIONS = [
+        { key: "likes", emoji: "❤️", label: "Thích" },
+        { key: "loves", emoji: "🔥", label: "Nóng" },
+        { key: "minds", emoji: "🤔", label: "Suy ngẫm" },
+        { key: "sads", emoji: "😢", label: "Buồn" },
+      ];
+
+      function renderReactButtons() {
+        const area = document.getElementById("reactions-area");
+        if (!area || !articleData) return;
+        const myReacts = currentUser
+          ? (articleData.userReactions || {})[currentUser.uid] || []
+          : [];
+
+        area.innerHTML = REACTIONS.map((r) => {
+          const active = myReacts.includes(r.key);
+          return `<button class="react-btn ${active ? "active" : ""}" id="rbtn-${r.key}" onclick="toggleReact('${r.key}')">
+        <span class="emoji">${r.emoji}</span>
+        <span>${r.label}</span>
+        <span class="count" id="rc-${r.key}">${articleData[r.key] || 0}</span>
       </button>`;
-    }).join('');
-  }
-  window.toggleReact = async (key) => {
-    if (!currentUser) { showToast('Vui lòng đăng nhập để react!'); return; }
-    const myReacts = ((articleData.userReactions||{})[currentUser.uid]||[]);
-    const has = myReacts.includes(key);
-    try {
-      await updateDoc(doc(db,'articles',articleId), {
-        [key]: increment(has?-1:1),
-        [`userReactions.${currentUser.uid}`]: has ? arrayRemove(key) : arrayUnion(key)
-      });
-      articleData[key] = (articleData[key]||0) + (has?-1:1);
-      if (!articleData.userReactions) articleData.userReactions = {};
-      if (!articleData.userReactions[currentUser.uid]) articleData.userReactions[currentUser.uid] = [];
-      if (has) articleData.userReactions[currentUser.uid] = myReacts.filter(r=>r!==key);
-      else articleData.userReactions[currentUser.uid].push(key);
-      renderReactButtons();
-    } catch(e) { showToast('Có lỗi xảy ra!'); }
-  };
+        }).join("");
+      }
 
-  // Share
-  window.shareFB = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}`,'_blank','width=600,height=400');
-  window.shareTW = () => {
-    const t = encodeURIComponent((articleData?.title||'')+' — ABCDNEWS');
-    window.open(`https://twitter.com/intent/tweet?text=${t}&url=${encodeURIComponent(location.href)}`,'_blank','width=600,height=400');
-  };
-  window.copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(location.href);
-      const btn = document.getElementById('btn-copy');
-      btn.classList.add('copied'); btn.innerHTML='✅ Đã sao chép!';
-      setTimeout(()=>{btn.classList.remove('copied');btn.innerHTML='🔗 Sao chép link';},2000);
-    } catch(e){}
-  };
+      window.toggleReact = async (key) => {
+        if (!currentUser) {
+          showToast("Vui lòng đăng nhập để thả biểu cảm!");
+          return;
+        }
 
-  // Comments
-  function renderCommentForm() {
-    const area = document.getElementById('comment-form-area');
-    if (!area) return;
-    if (!currentUser) {
-      area.innerHTML = `<div class="login-prompt">Vui lòng <a href="auth.html">đăng nhập</a> để bình luận.</div>`;
-      return;
-    }
-    area.innerHTML = `
+        const savingEl = document.getElementById("react-saving");
+        const myReacts =
+          (articleData.userReactions || {})[currentUser.uid] || [];
+        const has = myReacts.includes(key);
+
+        // Cập nhật UI ngay lập tức (optimistic update)
+        articleData[key] = (articleData[key] || 0) + (has ? -1 : 1);
+        if (!articleData.userReactions) articleData.userReactions = {};
+        if (!articleData.userReactions[currentUser.uid])
+          articleData.userReactions[currentUser.uid] = [];
+        if (has)
+          articleData.userReactions[currentUser.uid] = myReacts.filter(
+            (r) => r !== key,
+          );
+        else articleData.userReactions[currentUser.uid].push(key);
+        renderReactButtons();
+
+        // Lưu vào Firestore
+        if (savingEl) savingEl.textContent = "⏳ Đang lưu...";
+        try {
+          await updateDoc(doc(db, "articles", articleId), {
+            [key]: increment(has ? -1 : 1),
+            [`userReactions.${currentUser.uid}`]: has
+              ? arrayRemove(key)
+              : arrayUnion(key),
+          });
+          if (savingEl) {
+            savingEl.textContent = "✓ Đã lưu biểu cảm!";
+            setTimeout(() => {
+              if (savingEl) savingEl.textContent = "";
+            }, 2000);
+          }
+          showToast(
+            has
+              ? "Đã bỏ biểu cảm"
+              : `Đã thả ${REACTIONS.find((r) => r.key === key)?.emoji}`,
+            "ok",
+          );
+        } catch (e) {
+          // Rollback nếu lỗi
+          articleData[key] = (articleData[key] || 0) + (has ? 1 : -1);
+          if (has) articleData.userReactions[currentUser.uid].push(key);
+          else
+            articleData.userReactions[currentUser.uid] =
+              articleData.userReactions[currentUser.uid].filter(
+                (r) => r !== key,
+              );
+          renderReactButtons();
+          if (savingEl) savingEl.textContent = "";
+          showToast("Lưu thất bại. Vui lòng thử lại!");
+        }
+      };
+
+      // ── Share ──────────────────────────────────────────────
+      window.shareFB = () =>
+        window.open(
+          `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}`,
+          "_blank",
+          "width=600,height=400",
+        );
+      window.shareTW = () => {
+        const t = encodeURIComponent(
+          (articleData?.title || "") + " — ABCDNEWS",
+        );
+        window.open(
+          `https://twitter.com/intent/tweet?text=${t}&url=${encodeURIComponent(location.href)}`,
+          "_blank",
+          "width=600,height=400",
+        );
+      };
+      window.copyLink = async () => {
+        try {
+          await navigator.clipboard.writeText(location.href);
+          const btn = document.getElementById("btn-copy");
+          btn.classList.add("copied");
+          btn.innerHTML = "✅ Đã sao chép!";
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.innerHTML = "🔗 Sao chép link";
+          }, 2000);
+        } catch (e) {}
+      };
+
+      // ── Comments ───────────────────────────────────────────
+      function renderCommentForm() {
+        const area = document.getElementById("comment-form-area");
+        if (!area) return;
+        if (!currentUser) {
+          area.innerHTML = `<div class="login-prompt">
+        Vui lòng <a href="auth.html">đăng nhập</a> để tham gia bình luận.
+      </div>`;
+          return;
+        }
+        area.innerHTML = `
       <div class="comment-form">
-        <textarea id="comment-input" placeholder="Viết bình luận của bạn..."></textarea>
+        <textarea id="comment-input" placeholder="Chia sẻ suy nghĩ của bạn về bài viết này..."></textarea>
         <div class="comment-form-footer">
-          <span>Đăng với tên: <strong>${currentUser.displayName||currentUser.email}</strong></span>
-          <button class="btn-comment" id="btn-send" onclick="sendComment()">Gửi</button>
+          <span>Bình luận với tên: <strong>${currentUser.displayName || currentUser.email}</strong></span>
+          <button class="btn-comment" id="btn-send" onclick="sendComment()">Gửi bình luận</button>
         </div>
       </div>`;
-  }
-  window.sendComment = async () => {
-    if (!currentUser) return;
-    const text = document.getElementById('comment-input').value.trim();
-    if (!text) return;
-    const btn = document.getElementById('btn-send');
-    btn.disabled = true;
-    try {
-      await addDoc(collection(db,'articles',articleId,'comments'), {
-        text, userId: currentUser.uid,
-        userName: currentUser.displayName || currentUser.email,
-        createdAt: serverTimestamp()
-      });
-      await updateDoc(doc(db,'articles',articleId), {commentCount: increment(1)});
-      document.getElementById('comment-input').value = '';
-      loadComments();
-    } catch(e) { showToast('Gửi bình luận thất bại!'); }
-    finally { btn.disabled = false; }
-  };
-  async function loadComments() {
-    try {
-      const snap = await getDocs(query(collection(db,'articles',articleId,'comments'), orderBy('createdAt','desc')));
-      const comments = snap.docs.map(d=>({id:d.id,...d.data()}));
-      const title = document.getElementById('comments-title');
-      if (title) title.textContent = `Bình luận (${comments.length})`;
-      const list = document.getElementById('comments-list');
-      if (!list) return;
-      if (!comments.length) { list.innerHTML='<div class="no-comments">Chưa có bình luận nào. Hãy là người đầu tiên!</div>'; return; }
-      list.innerHTML = comments.map(c => {
-        const init = (c.userName||'U').substring(0,1).toUpperCase();
-        const canDel = currentUser && currentUser.uid === c.userId;
-        return `<div class="comment-item">
-          <div class="com-avatar">${init}</div>
+      }
+
+      window.sendComment = async () => {
+        if (!currentUser) return;
+        const text = document.getElementById("comment-input").value.trim();
+        if (!text) return;
+        const btn = document.getElementById("btn-send");
+        btn.disabled = true;
+        btn.textContent = "Đang gửi...";
+        try {
+          await addDoc(collection(db, "articles", articleId, "comments"), {
+            text,
+            userId: currentUser.uid,
+            userName: currentUser.displayName || currentUser.email,
+            createdAt: serverTimestamp(),
+            isSample: false,
+          });
+          await updateDoc(doc(db, "articles", articleId), {
+            commentCount: increment(1),
+          });
+          document.getElementById("comment-input").value = "";
+          showToast("✓ Đã đăng bình luận!", "ok");
+          loadComments();
+        } catch (e) {
+          showToast("Gửi bình luận thất bại!");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Gửi bình luận";
+        }
+      };
+
+      async function loadComments() {
+        try {
+          const q = query(
+            collection(db, "articles", articleId, "comments"),
+            orderBy("createdAt", "desc"),
+          );
+          const snap = await getDocs(q);
+          const realComments = snap.docs.map((d) => ({
+            id: d.id,
+            ...d.data(),
+          }));
+
+          const title = document.getElementById("comments-title");
+          const total = realComments.length + SAMPLE_COMMENTS.length;
+          if (title) title.textContent = `Bình luận (${total})`;
+
+          const list = document.getElementById("comments-list");
+          if (!list) return;
+
+          // Render bình luận thật
+          const realHTML = realComments
+            .map((c) => {
+              const init = (c.userName || "U").substring(0, 1).toUpperCase();
+              const canDel = currentUser && currentUser.uid === c.userId;
+              return `<div class="comment-item">
+          <div class="com-avatar user">${init}</div>
           <div class="com-body">
             <div class="com-header">
-              <span class="com-name">${c.userName||'Ẩn danh'}</span>
+              <span class="com-name">${c.userName || "Ẩn danh"}</span>
               <span class="com-time">${fmtDate(c.createdAt)}</span>
-              ${canDel?`<button class="com-delete" onclick="delComment('${c.id}')">✕ Xóa</button>`:''}
+              ${canDel ? `<button class="com-delete" onclick="delComment('${c.id}')">✕ Xóa</button>` : ""}
             </div>
             <p class="com-text">${escHtml(c.text)}</p>
           </div>
         </div>`;
-      }).join('');
-    } catch(e) { console.error(e); }
-  }
-  window.delComment = async (cid) => {
-    if (!confirm('Xóa bình luận này?')) return;
-    await deleteDoc(doc(db,'articles',articleId,'comments',cid));
-    await updateDoc(doc(db,'articles',articleId), {commentCount: increment(-1)});
-    loadComments();
-  };
+            })
+            .join("");
 
-  // Helpers
-  function fmtDate(ts) {
-    if (!ts) return '';
-    try { return (ts.toDate?ts.toDate():new Date(ts)).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
-    catch(e){ return ''; }
-  }
-  function escHtml(t) { return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent=msg; t.className='toast show';
-    setTimeout(()=>t.className='toast',3000);
-  }
+          // Render bình luận mẫu
+          const sampleHTML = SAMPLE_COMMENTS.map((c) => {
+            const init = c.name.substring(0, 1);
+            return `<div class="comment-item">
+          <div class="com-avatar sample">${init}</div>
+          <div class="com-body">
+            <div class="com-header">
+              <span class="com-name">${c.name}</span>
+              ${c.badge ? '<span class="com-badge">Độc giả thân thiết</span>' : ""}
+              <span class="com-time">${c.time}</span>
+            </div>
+            <p class="com-text">${c.text}</p>
+          </div>
+        </div>`;
+          }).join("");
 
-  loadArticle();
-</script>
-</body>
+          list.innerHTML =
+            realHTML +
+            (realComments.length > 0 && SAMPLE_COMMENTS.length > 0
+              ? '<hr class="com-divider"/>'
+              : "") +
+            sampleHTML;
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      window.delComment = async (cid) => {
+        if (!confirm("Xóa bình luận này?")) return;
+        try {
+          await deleteDoc(doc(db, "articles", articleId, "comments", cid));
+          await updateDoc(doc(db, "articles", articleId), {
+            commentCount: increment(-1),
+          });
+          showToast("✓ Đã xóa bình luận.", "ok");
+          loadComments();
+        } catch (e) {
+          showToast("Xóa thất bại!");
+        }
+      };
+
+      // ── Helpers ────────────────────────────────────────────
+      function fmtDate(ts) {
+        if (!ts) return "";
+        try {
+          return (ts.toDate ? ts.toDate() : new Date(ts)).toLocaleDateString(
+            "vi-VN",
+            {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            },
+          );
+        } catch (e) {
+          return "";
+        }
+      }
+      function escHtml(t) {
+        return String(t)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+      function showToast(msg, type = "") {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.className = `toast show${type === "ok" ? " ok" : ""}`;
+        setTimeout(() => (t.className = "toast"), 3000);
+      }
+
+      loadArticle();
+    </script>
+  </body>
 </html>
