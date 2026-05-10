@@ -1,146 +1,189 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Giới thiệu — ABCDNEWS</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="./assets/css/about.css" />
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Giới thiệu — ABCDNEWS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="./assets/css/pages.css"/>
+  <style>
+    .values-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px;}
+    .value-card{background:rgba(22,22,26,0.72);border:1px solid rgba(160,160,160,0.13);border-radius:3px;padding:24px 20px;text-align:center;transition:border-color 0.2s,transform 0.2s;}
+    .value-card:hover{border-color:rgba(192,57,43,0.35);transform:translateY(-2px);}
+    .value-icon{font-size:2rem;margin-bottom:14px;}
+    .value-title{font-family:'Playfair Display',serif;font-size:1rem;color:#fff;margin-bottom:8px;}
+    .value-desc{font-size:0.80rem;color:#888;line-height:1.72;}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:22px;}
+    .stat-card{background:rgba(192,57,43,0.08);border:1px solid rgba(192,57,43,0.2);border-radius:3px;padding:22px 16px;text-align:center;}
+    .stat-num{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:900;color:#c0392b;margin-bottom:6px;}
+    .stat-label{font-size:0.70rem;color:#888;letter-spacing:1px;text-transform:uppercase;}
+    .team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px;}
+    .team-card{background:rgba(22,22,26,0.72);border:1px solid rgba(160,160,160,0.13);border-radius:3px;padding:26px 20px;text-align:center;transition:border-color 0.2s;}
+    .team-card:hover{border-color:rgba(192,57,43,0.3);}
+    .team-avatar{width:64px;height:64px;border-radius:50%;background:#c0392b;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:900;color:#fff;margin:0 auto 14px;}
+    .team-name{font-weight:600;color:#fff;margin-bottom:4px;font-size:0.92rem;}
+    .team-role{font-size:0.70rem;color:#c0392b;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+    .team-bio{font-size:0.78rem;color:#888;line-height:1.65;}
+    .timeline{margin-top:22px;position:relative;padding-left:28px;}
+    .timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:1px;background:rgba(160,160,160,0.15);}
+    .tl-item{position:relative;margin-bottom:28px;}
+    .tl-dot{position:absolute;left:-25px;top:4px;width:12px;height:12px;border-radius:50%;background:#c0392b;border:2px solid #1a1a1a;}
+    .tl-year{font-size:0.68rem;letter-spacing:2px;color:#c0392b;font-weight:700;margin-bottom:5px;}
+    .tl-title{font-weight:600;color:#fff;font-size:0.92rem;margin-bottom:4px;}
+    .tl-desc{font-size:0.82rem;color:#888;line-height:1.6;}
+    @media(max-width:768px){
+      .values-grid,.team-grid{grid-template-columns:1fr;}
+      .stats-grid{grid-template-columns:repeat(2,1fr);}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-top">
+    <a href="index.html" class="logo">ABCDNEWS</a>
+    <button class="btn-home" onclick="location.href='index.html'">← Trang chủ</button>
+  </div>
+</header>
 
-  </head>
-  <body>
-    <header>
-      <div class="header-top">
-        <a href="index.html" class="logo">ABCDNEWS</a>
-        <button class="btn-back" onclick="location.href = 'index.html'">
-          ← Trang chủ
-        </button>
+<div class="page-wrap">
+<div class="container">
+
+  <div class="page-hero">
+    <div class="page-tag">Về chúng tôi</div>
+    <h1 class="page-title">Tin tức đáng tin cậy,<br/>mỗi ngày</h1>
+    <p class="page-subtitle">ABCDNEWS là trang báo điện tử độc lập, cam kết cung cấp thông tin nhanh chóng, chính xác và đa chiều về mọi lĩnh vực trong cuộc sống.</p>
+  </div>
+
+  <div class="section">
+    <h2>Sứ mệnh</h2>
+    <p>Chúng tôi tin rằng thông tin chất lượng là quyền cơ bản của mỗi người. ABCDNEWS ra đời với sứ mệnh mang đến nguồn tin xác thực, khách quan và kịp thời — giúp độc giả hiểu rõ hơn về thế giới xung quanh.</p>
+    <p>Mỗi bài viết được kiểm chứng kỹ càng trước khi đăng tải. Chúng tôi không chạy theo click-bait hay tin giật gân — chỉ có sự thật và phân tích sâu sắc.</p>
+  </div>
+
+  <div class="section">
+    <h2>Giá trị cốt lõi</h2>
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="value-icon">⚡</div>
+        <div class="value-title">Nhanh chóng</div>
+        <p class="value-desc">Cập nhật tin tức nóng hổi trong vòng 15 phút sau khi sự kiện xảy ra.</p>
       </div>
-    </header>
-
-    <div class="page-wrap">
-      <div class="container">
-        <div class="page-hero">
-          <div class="page-tag">Về chúng tôi</div>
-          <h1 class="page-title">Tin tức đáng tin cậy,<br />mỗi ngày</h1>
-          <p class="page-subtitle">
-            ABCDNEWS là trang báo điện tử độc lập, cam kết cung cấp thông tin
-            nhanh chóng, chính xác và đa chiều về mọi lĩnh vực trong cuộc sống.
-          </p>
-        </div>
-
-        <div class="section">
-          <h2>Sứ mệnh của chúng tôi</h2>
-          <p>
-            Chúng tôi tin rằng thông tin chất lượng là quyền cơ bản của mỗi
-            người. ABCDNEWS ra đời với sứ mệnh mang đến nguồn tin xác thực,
-            khách quan và kịp thời — giúp độc giả hiểu rõ hơn về thế giới xung
-            quanh.
-          </p>
-          <p>
-            Mỗi bài viết được kiểm chứng kỹ càng trước khi đăng tải. Chúng tôi
-            không chạy theo click-bait hay tin giật gân — chỉ có sự thật và phân
-            tích sâu sắc.
-          </p>
-        </div>
-
-        <div class="section">
-          <h2>Giá trị cốt lõi</h2>
-          <div class="values-grid">
-            <div class="value-card">
-              <div class="value-icon">⚡</div>
-              <div class="value-title">Nhanh chóng</div>
-              <p class="value-desc">
-                Cập nhật tin tức nóng hổi trong vòng 15 phút sau khi sự kiện xảy
-                ra.
-              </p>
-            </div>
-            <div class="value-card">
-              <div class="value-icon">🎯</div>
-              <div class="value-title">Chính xác</div>
-              <p class="value-desc">
-                Mọi thông tin đều được xác minh từ ít nhất 2 nguồn độc lập trước
-                khi đăng.
-              </p>
-            </div>
-            <div class="value-card">
-              <div class="value-icon">🌐</div>
-              <div class="value-title">Đa chiều</div>
-              <p class="value-desc">
-                Nhìn nhận sự kiện từ nhiều góc độ khác nhau, không thiên vị.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="section">
-          <h2>Con số ấn tượng</h2>
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-num">500K+</div>
-              <div class="stat-label">Độc giả/tháng</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-num">1,200+</div>
-              <div class="stat-label">Bài viết</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-num">8</div>
-              <div class="stat-label">Danh mục</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-num">2020</div>
-              <div class="stat-label">Năm thành lập</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="section" id="toasoang">
-          <h2>Đội ngũ biên tập</h2>
-          <div class="team-grid">
-            <div class="team-card">
-              <div class="team-avatar">NT</div>
-              <div class="team-name">Nguyễn Thanh Tùng</div>
-              <div class="team-role">Tổng Biên tập</div>
-              <p class="team-bio">
-                15 năm kinh nghiệm trong ngành báo chí. Từng công tác tại
-                VnExpress và Tuổi Trẻ.
-              </p>
-            </div>
-            <div class="team-card">
-              <div class="team-avatar">PL</div>
-              <div class="team-name">Phạm Thị Lan</div>
-              <div class="team-role">Phó Tổng Biên tập</div>
-              <p class="team-bio">
-                Chuyên gia về mảng kinh tế và tài chính. Thạc sĩ Báo chí ĐH Quốc
-                gia Hà Nội.
-              </p>
-            </div>
-            <div class="team-card">
-              <div class="team-avatar">LM</div>
-              <div class="team-name">Lê Văn Minh</div>
-              <div class="team-role">Trưởng ban Công nghệ</div>
-              <p class="team-bio">
-                Theo dõi và phân tích xu hướng công nghệ toàn cầu hơn 10 năm.
-              </p>
-            </div>
-          </div>
-        </div>
+      <div class="value-card">
+        <div class="value-icon">🎯</div>
+        <div class="value-title">Chính xác</div>
+        <p class="value-desc">Mọi thông tin được xác minh từ ít nhất 2 nguồn độc lập trước khi đăng.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">🌐</div>
+        <div class="value-title">Đa chiều</div>
+        <p class="value-desc">Nhìn nhận sự kiện từ nhiều góc độ khác nhau, không thiên vị.</p>
       </div>
     </div>
+  </div>
 
-    <footer>
-      <div class="footer-bottom">
-        <p>© 2025 <strong>ABCDNEWS</strong> — All rights reserved.</p>
-        <div class="footer-links">
-          <a href="terms.html">Điều khoản</a>
-          <a href="privacy.html">Bảo mật</a>
-          <a href="contact.html">Liên hệ</a>
-        </div>
+  <div class="section">
+    <h2>Con số nổi bật</h2>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num">500K+</div><div class="stat-label">Độc giả/tháng</div></div>
+      <div class="stat-card"><div class="stat-num">1,200+</div><div class="stat-label">Bài viết</div></div>
+      <div class="stat-card"><div class="stat-num">8</div><div class="stat-label">Danh mục</div></div>
+      <div class="stat-card"><div class="stat-num">2020</div><div class="stat-label">Năm thành lập</div></div>
+    </div>
+  </div>
+
+  <div class="section" id="toasoang">
+    <h2>Đội ngũ biên tập</h2>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar">NT</div>
+        <div class="team-name">Nguyễn Thanh Tùng</div>
+        <div class="team-role">Tổng Biên tập</div>
+        <p class="team-bio">15 năm kinh nghiệm báo chí. Từng công tác tại VnExpress và Tuổi Trẻ.</p>
       </div>
-    </footer>
-  </body>
+      <div class="team-card">
+        <div class="team-avatar">PL</div>
+        <div class="team-name">Phạm Thị Lan</div>
+        <div class="team-role">Phó Tổng Biên tập</div>
+        <p class="team-bio">Chuyên gia kinh tế - tài chính. Thạc sĩ Báo chí ĐH Quốc gia Hà Nội.</p>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">LM</div>
+        <div class="team-name">Lê Văn Minh</div>
+        <div class="team-role">Trưởng ban Công nghệ</div>
+        <p class="team-bio">Theo dõi và phân tích xu hướng công nghệ toàn cầu hơn 10 năm.</p>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">TH</div>
+        <div class="team-name">Trần Thu Hà</div>
+        <div class="team-role">Trưởng ban Xã hội</div>
+        <p class="team-bio">Phóng viên kỳ cựu, nhiều năm theo dõi mảng giáo dục và sức khỏe.</p>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">BK</div>
+        <div class="team-name">Bùi Quang Khải</div>
+        <div class="team-role">Trưởng ban Thể thao</div>
+        <p class="team-bio">Cựu vận động viên, có mặt tại hơn 20 giải đấu thể thao quốc tế.</p>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">MN</div>
+        <div class="team-name">Mai Thị Ngọc</div>
+        <div class="team-role">Trưởng ban Giải trí</div>
+        <p class="team-bio">Nhà phê bình văn hóa - nghệ thuật, tốt nghiệp ĐH Sân khấu Điện ảnh.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Lịch sử phát triển</h2>
+    <div class="timeline">
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2020</div><div class="tl-title">Thành lập ABCDNEWS</div><p class="tl-desc">Ra mắt với 5 thành viên sáng lập, tập trung vào mảng tin tức thời sự và kinh tế.</p></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2021</div><div class="tl-title">Mở rộng danh mục</div><p class="tl-desc">Bổ sung các chuyên mục Công nghệ, Giải trí, Thể thao. Đạt 50.000 độc giả/tháng.</p></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2022</div><div class="tl-title">Ra mắt ứng dụng di động</div><p class="tl-desc">Phát hành app iOS & Android. Tổng lượt tải đạt 200.000 trong năm đầu tiên.</p></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2023</div><div class="tl-title">Top 10 báo điện tử Việt Nam</div><p class="tl-desc">Được vinh danh trong Top 10 trang tin tức được đọc nhiều nhất Việt Nam.</p></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-year">2025</div><div class="tl-title">Nền tảng mới hoàn toàn</div><p class="tl-desc">Ra mắt giao diện mới, tích hợp Firebase — mang đến trải nghiệm đọc tin tốt nhất.</p></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <span class="footer-logo">ABCDNEWS</span>
+      <p>Trang báo điện tử cung cấp thông tin nhanh chóng, chính xác và đa dạng.</p>
+      <div class="footer-socials">
+        <a class="social-btn">f</a><a class="social-btn">▶</a>
+        <a class="social-btn">𝕏</a><a class="social-btn">Z</a>
+      </div>
+    </div>
+    <div class="footer-col"><h4>Danh mục</h4><ul>
+      <li><a href="index.html">Thời sự</a></li><li><a href="index.html">Công nghệ</a></li>
+      <li><a href="index.html">Kinh tế</a></li><li><a href="index.html">Thể thao</a></li>
+      <li><a href="index.html">Giải trí</a></li><li><a href="index.html">Sức khỏe</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Về chúng tôi</h4><ul>
+      <li><a href="about.html">Giới thiệu</a></li>
+      <li><a href="about.html#toasoang">Tòa soạn</a></li>
+      <li><a href="contact.html">Liên hệ</a></li>
+      <li><a href="contact.html#ads">Quảng cáo</a></li>
+      <li><a href="admin-login.html">Dành cho Admin</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Hỗ trợ</h4><ul>
+      <li><a href="terms.html">Điều khoản sử dụng</a></li>
+      <li><a href="privacy.html">Chính sách bảo mật</a></li>
+      <li><a href="terms.html#community">Quy tắc cộng đồng</a></li>
+      <li><a href="auth.html">Đăng ký tài khoản</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 <strong>ABCDNEWS</strong> — All rights reserved.</p>
+    <div class="footer-links">
+      <a href="terms.html">Điều khoản</a>
+      <a href="privacy.html">Bảo mật</a>
+      <a href="contact.html">Liên hệ</a>
+    </div>
+  </div>
+</footer>
+</body>
 </html>
